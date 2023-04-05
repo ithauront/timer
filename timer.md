@@ -137,3 +137,89 @@ export function Button ({ variant = 'primary' }: ButtonProps) {
 
 então o styled componentes traz uma certa complexisdade mas ajuda muitooo quando vamos pensar em componentes que mudam de estilizaçoes diversas vezes. essas mudanças de estilizaçoes se forem todas feitas com classe daria mais trabalho de codificar tudo.
 
+a gente pode colocar um css e importar ele automaticamente do styled componenets para a gente ter a  formataçao do css em nosso styled. o return fica assim:
+return  css`background-color: ${ButtonVariant[props.variant]}`   
+    }}
+
+## configuarar temas
+podemos ter varios temas, geralmente usamos o ligth ou o dark mas no styled a gente ode ter quantos a gente quiser e eles sqao contolados por JS
+* dentro da pasta src vamos criar uma pasta chamada styles e dentro dela uma chamada themes dento da themes vamos criar o tema default ou seja padrao.
+dentro desse default vamos dar o export const o nome do arquivo e podemos por exemplo setar cores la. dessa forma.
+export const defaultTheme = {
+    primary: 'purple',
+    secondary: 'orange',
+    
+}
+e agora a gente volta para o app. e la importamos do styled components um ThemeProvider que é algo ja embutido do styledComponents desa forma
+import { ThemeProvider } from 'styled-components'
+e ai dentro dos botoes nos vamos colocar o theme provider. assim o theme so vai ser aplicado para componentes que estiverem dentro do theme provider. podemos colocar ele no lugar do fragment. como ele é um componente ele vai receber uma propriedade chamada theme. e vamos passar para essa theme o nosso default. fica assim:
+  return (
+    < ThemeProvider theme={defaultTheme}>
+    < Button variant="primary" />
+    < Button variant="secondary" />
+    < Button variant="success" />
+    < Button variant="danger" />
+    <Button />
+    </ ThemeProvider>
+    )
+
+    agora na nossa estilização do buttonContainer n button.styles a gente consegue acessar as variaveis que a gente colocou no theme. 
+    vamos cimentar os props que tinhamos feito nos butoes no styles.
+    vamos dizer que a nossa cor de fundo a gente queira que seja a nossa primaria que cadastramos no theme. a gente consegue acessar isso . fica assim:
+
+    export const ButtonContainer = styled.button<ButtonContainerProps>`
+    width: 100px;
+    height: 40px;
+
+    background-color: ${ props => props.theme.primary}
+
+`
+dessa forma ele vai pegar a background cor o string que esta no theme.primary que no caso é roxo. e vai importar isso e o sistema vai interpretar no lugar certo como uma cor. 
+nossa aplicação so vai ter um thema mas vamos entender como faz para mudar de tema aqui.
+# mudando de tema.
+precisamos de um outro arquivo com as estilizaçoes de um segundo dema la no styles / themes por exemplo um arquivo dark.
+no theme provider do arquivo app vamos usar uma funcionalidade para alternar o thema usando por exemplo um estado sendo ativado por exemplo ao clicar um botão.
+return (
+    < ThemeProvider theme={defaultTheme}>
+    trocariamos ao clicar em um botão o default theme para light theme. e ai toda a aplicação troca as cores automaticamente por que elas respondem a isso. mas ai temos que usar os nmes igauis nos dois arquivos.
+
+# tipagem de temas
+o styled components não da as sugestoes do que tem dentro la do tema( por exemplo o primary ou secundary) nos podemos fazer isso manualmente criando arquivos de tipagem de temas.
+dentro da pasta src vamos criar uma pasta @types ( o nome não precisa ser esse) mas botamos o @ para que ele fique no inicio. e nela vamos criar um arquivo chamado styled.d.ts o d.ts significa que dentro desse artuivo eu so vou ter codigo de definição de tipos de typescript e nada do javascript. ou seja, tipos de interface.
+nesse arquivo vamos importar a styled-components
+e tambem o nossodefaultTheme do outro arquivo de tema.
+se passarmos o mouse no defaultthelme ele ja vai mostrar a tipagem que ele tem.
+nessa pagina então vamos fazer o type dele 
+fica assim
+type ThemeType = typeof defaultTheme
+o typeof ja é uma coisa padrão do typescript.
+o themetype foi o que escolhemos e o defaulttheme é o nome do arquivo.
+assim ele ja sabe que o themetype é o primary = string etc.
+isso do styled.d.ts é uma coisa que a gente geralmente faz pouco e não decora. então muitas vezes a gente tem um exempo disso de qlgum projeto que a gente fez e a gente vai copiando sempre que precisa. isso é muito comum na programação reutilizar coisas.
+vamos então declarar. essa declaração vai ser para sempre que a gente importar o styled modules ele puxar a tipagem que iremos definir aqui. nos importamos o styled components primeiro e depois declaramos ele de novo porque essa importação traz a maior bagagem dele ai nos precisamos declarar so o que iremos atualizar. se não teriamos que fazer do 0 é meio que como usamos o [...estate, estate] . dentro dessa declaração vamos exportar a interface DefaultTheme e extender ela com o themeType fica assim:
+
+import 'styled-components' ;
+import { defaultTheme } from '../styles/themes/default'; 
+
+type ThemeType = typeof defaultTheme
+
+declare module 'styled-components'{
+    export interface DefaultTheme extends ThemeType {}
+}
+ o interface que a gente exporta é o DefaultTheme com D maiusculo que é uma propriedade nativa d styled. 
+
+ ## estilo global
+ na pasta styles que fica dentro do componentes vamos criar um arquivo chamado global.ts (ts e não css que era o que usavamos até agora.)
+ então até os estilos globais vao ser em typescritp usando o styled-components
+ vamos importar de dentro do styled-components uma função chamada create global style essa funçé:ao ja faz parte da biblioteca do styled commpoonetns
+ vamos exportar um component chamado global style. que é igual ao createGlobalStyle e colocamos as crases e dentro delas todos as estilizaçoes que queemos que sejam globais.
+  uma vez que o global style esteja estilizado nos podemos importar ele em qualquer lugar da aplicação que a gente queira.  como por exemplo no app. so é importante que ele esteja dentro da tag do themeProvider para que ele possa aproveitar das variaçoes que iremos fazer com nossos temas. o componente globalstyle pode ser importado em quaquer posição dentro do themeprovider; apos fazer isso o estilo global ja começa a funcionar.
+
+  # cores e fontes
+
+  vamos importar a fonte la do google. selecionamos e colamos o link no nosso index html.
+  com isso feito podemos voltar para os estilos globais e definir que pro body input e text vamos usar essas fontes.
+  
+
+
+
