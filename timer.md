@@ -207,6 +207,7 @@ declare module 'styled-components'{
     export interface DefaultTheme extends ThemeType {}
 }
  o interface que a gente exporta é o DefaultTheme com D maiusculo que é uma propriedade nativa d styled. 
+ 
 
  ## estilo global
  na pasta styles que fica dentro do componentes vamos criar um arquivo chamado global.ts (ts e não css que era o que usavamos até agora.)
@@ -219,7 +220,10 @@ declare module 'styled-components'{
 
   vamos importar a fonte la do google. selecionamos e colamos o link no nosso index html.
   com isso feito podemos voltar para os estilos globais e definir que pro body input e text vamos usar essas fontes.
-  
+    colocamos as fontes e o tamanho padrao e tudo mais no global.
+    cores. copiamos as cores todas que vamos usar mla do figma e colocamos elas com nome de variaveis e colocamos elas la no nosso tema default.ts.
+    agora com as cores setadas vamos voltar no global.ts e vamos utilizar as cores. e usamos elas usando aquela sintax ${props => props.theme.[gray-900]} por exemplo. fica em [ ] por causa do hifem no meio ai não aceita usar a sintax de . 
+    o button tambem deu erro porque ele estava ainda com a cor primary a gente ajustou isso. e ja criamos o estilo de cores e fonte de nossa aplicação.
 
 
 
