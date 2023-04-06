@@ -225,5 +225,41 @@ declare module 'styled-components'{
     agora com as cores setadas vamos voltar no global.ts e vamos utilizar as cores. e usamos elas usando aquela sintax ${props => props.theme.[gray-900]} por exemplo. fica em [ ] por causa do hifem no meio ai não aceita usar a sintax de . 
     o button tambem deu erro porque ele estava ainda com a cor primary a gente ajustou isso. e ja criamos o estilo de cores e fonte de nossa aplicação.
 
+# ESlint
+vamos configurar o ES lint no projeto. isso é um processo que valida que o seu codigo esta seguindo padroes estipulado pelos criadores do projeto. isso é linting. como tem coisas nos codigos que são facultativas, como por exemplo aspas duplas ou aspas simples, colocar ponto e virugla no fim essas coisas. fazendo o linting q gente não precisa se preocupar em seguir o padrão estipulado pela equip, podemos escrever como quisermos queo linting vai transformar isso no padrão que a gente estipular.
+temos que baixar a extençãodo eslint
+podemos ler a documentação do eslint para entender ele melhor se quisermos mas agora vamos logo instalar ele.
+vamos na pasta d projeto no terminal
+npm i eslint -D 
+assim instala ele como dependencia de desenvolvimento
+vamos instalar uma configuração da rocketseat para o eslint
+npm i @rocketseat/eslint-config -D
+assim vamos usar uma configuração ja existente. mas nos podemos tambem criar a nossa dando o codigo
+npx eslint --init
+e ai ele vai fazer varias perguntas e nos vamos respondendo para configurar
+agora com tudo instalado vamos criar um arquivo dentro da pasta src chamado .esinitrc.json ou .js tato faz.
+dentro desse aqruivo vamos simplismente escrever:
+{
+    "extends": "@rocketseat/eslint-config/react"
+}
+
+como vamos testar?
+podemos rodar no nosso terminarl o comando
+npx eslint src --ext .ts,.tsx
+assim ele vai achar o arquivo na sorce e vai procurar em todos os arquivos .ts ou .tsx se tem erros de codigo.
+ele vai te mostrar os varios erros; os arquivos no vscode tambem vao começar a mostrar erros. a gente pode ir mudando umpor um ou ir em uma configuraão do vscode.
+a gente da cntrl shfp p e pesauisa setings user preference json
+la a gente adiciona ao objeto essa linha
+"editor.codeActionsOnSave": {"source.fixAll.eslint": true}
+isso significa que o editor ao salvar um arquivo vai resolver todos os problemas que o eslint aponta com a solução que ele aponta.
+agora podemos ir la no nossos arquivos e ir salvando ele.
+da tambem para corrigir todos os erros do projeto inteiro de uma so vez. temos que rodar esse comando 
+npx eslint src --ext .ts,.tsx --fix
+nos podemos aproveitar e criar um script no package json com esse codigo sem o npx e o fix para que a gente possa rodar o linting sem precisar escrever esse codigo de novo. vamos no pakckage json procuramos os scripts e colocamos "lint" : "eslint src --ext .ts,.tsx"
+agora a gente consegue rodar ele so com o comando npm run lint
+e para fixar a gente pode dar o npm run lint --fix
+
+
+
 
 
