@@ -346,6 +346,26 @@ nos passamos ele para o / porque queremos aplicar isso para todas as rotas.
 se a gente tiver layouts diferentes a gente pode fazer outra route com um path diferente para todas as rotas que tem esse path vao ter um outro layout que podemos criar.
 se a gente tiver uma rota dentro da outra vai ser a soma dos paths dela para acessar a filha.
 
+# Header e layout
+ccomo todas as paginas vao ter o header e o layout da box cinza em volta delas e a gente ja configutou esse defaultlayout para estar em volta de nossa aplicação agora vamos configurar ele para que ele funone como queremos que funcione em nosso app
+por estarmos usando o styled components que é algo que o arquivo de estilo cvai estar separado do arquivo do component podemos criar uma pasta chamada defaault layout dentro da pasta layout para juntar o arquivo e seu estilo na mesma pasta. mas isso é opcionl todo o esquema de pastas é sempre opcional. nesse caso podemos chamar o componente de layout que esta nessa pagina de index e o de estilização de styles; todo arquivo que tenha dependecia do defaultlayout eles vao estar nessa pagina./
+o styhles vai ser um styled component e vai seguir o padrão de um
+e nele vamos criar um componente estilizado chamado layoutContainer (o nome tanto faz)
+vamos estilizar no styles e no index nos vamos importar ele e colocar por volta do que tinhamos na div. e temos tambem que atualizar o local do header porque colocamos mais uma pasta.
+importamos o phospor e pegamos o icone do ignite do figma.
+nos colocamos ma border transparent nos icones. isso é para que quando a gente de o hoover ela possa mudar de cor. no natural ela não é visivel
+nos colocamos essa border tanto no top quanto no bottom em transparente porque se não ele joga o icone um pouco pra cima. e acho que se a gente colocar so no hover e não ela transparente sempre estando la tambem vai acontecer isso. colocamos no top tambem para eme ficar centralizado.
+estilizamos os icones porem eles não estao mandando para lugar nenhum
+vamos na no header e vamos modificar a ancora do link por um componente do reactDom que manda para o local. que é o navlink no lugar do a e to no lugar do href fica assim
+   <NavLink to="/">
+          <Timer size={24} />
+        </NavLink>
+    como o navink não diz nada para a acessibilidade a gente geralmente coloca um title com para onde ele vai.
+    o ultimo ponto é que o navLink é que ele por baixo dos panos coloca uma classe chamada active que diz em qual pagina voce estae um ariacurent 'page' 
+    podemos usar esse active para fazer uma estilização do link. no caso vamos colocar um green-500 na classe active. isso quer dizer que o icone da pagina em que estivermos vai ficar verde.
+    se ligar que o &:hover e o &.active tem que ficar dentro da tag de estilização do a. 
+
+
 
 
 
