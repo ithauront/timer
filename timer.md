@@ -259,6 +259,95 @@ nos podemos aproveitar e criar um script no package json com esse codigo sem o n
 agora a gente consegue rodar ele so com o comando npm run lint
 e para fixar a gente pode dar o npm run lint --fix
 
+# rotas
+para lidar com as rotas que são por exemplo se o cliente digitar o site / algo a gente chegar nessa pagina. para isso vamos usar uma biblioteca mais famosa chamada react routes vamos instalar
+npm i react-router-dom
+vamos criar uma pasta pages dentro de scr e dentro dela vamos criar o arquivo home e o arquivo history ambos tsx
+em ambos vamos dar o export funciton
+e vamos no app apagar o a chamada do button que nos não vamos utilizar
+e vamos criar no src um novo componente chamado router.tsx  a gente poderia escrever ele todo dentro do app mas para separar a definição de rotas vamos colocar ele eme um componente diferente.
+vamos fazer a declaração de quais rotas temos na aplicação tambem usando a logica de compoentnes.
+vamos esportar a função router
+vamos importar os componentes Routes e Route do react roter dom
+e dentro da funão vamos retornar a tag routes e dentro dela os route
+no route temos que dar como propriedade o path no caso da home vamos comocar so a / e damos o elemento quje vai carregar e colocamos o componente no formato tag fazendo a importação dessa pagina.
+fica assim:
+import { Routes, Route } from 'react-router-dom'
+import { Home } from './pages/Home'
+import { History } from './pages/History'
+
+export function Router() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/history" element={<History />} />
+    </Routes>
+  )
+}
+
+no console log vai dar erro. temos que corrigir algumas coisas. porque precisamos importar o browser router do reactdom e fazer um wrap do react dom dentro do brouser Router. para fazer isso vamos no app. e importamos o browser router 
+e envolvemos toda a aplicação nele. ele pode ir tanto por fora ou por dentro do theme provider nao az diferença o blobal style tambem pode ficar por fora. a coisa que é importante é que o berowser router fique por fora de nossazs rotas.. o app fica assim
+import { ThemeProvider } from 'styled-components'
+import { BrowserRouter } from 'react-router-dom'
+import { defaultTheme } from './styles/themes/default'
+import { GlobalStyle } from './styles/global'
+import { Router } from './router'
+
+export function App() {
+  return (
+    <ThemeProvider theme={defaultTheme}>
+      <BrowserRouter>
+        <Router />
+      </BrowserRouter>
+      <GlobalStyle />
+    </ThemeProvider>
+  )
+}
+
+e agora la no navegador podemos mudar de pagina usando o /no endereço.
+
+# layout de rotas
+na nossa aplicação temos coisas que se repetem visualmente indepen,dete da rota que a pessoa esta acessando.
+como por exemplo o header. e se a gente ficar repetindo esses elementos nas diferentes rotas tudo isso vai ser recriado do zero.
+vamos criar nosso componente header.
+depois vamos crir uma nova pasta chamada layouts
+e dentro dela vamos criar o um layout default
+nesse layout nos vamos exportar a funão e dentro dela vamos retornar o Header importando ele e abaixo disso vamos colocar nosso conteudo. vai ficar assim
+iimport { Outlet } from 'react-router-dom'
+import { Header } from '../components/Header'
+
+export function DefaultLayout() {
+  return (
+    <div>
+      <Header />
+      <Outlet />
+    </div>
+  )
+}
+nesse caso o conteudo (outlet) é algo mutavel.
+e para deixar ele mutavel vamos usaro o componente outlet. que éum espaço para ser inserido um conteudo. ai o react router dom vai saber onde deve posicionar o conteudo especifico de cada pagina.
+vamos la no router; e por volta das duas outras rotas colocamos mais uma tag route no singular.
+e nesse route vamos passar o path / e o elemento default layot fica assim import { Routes, Route } from 'react-router-dom'
+import { Home } from './pages/Home'
+import { History } from './pages/History'
+import { DefaultLayout } from './layouts/DefaultLayout'
+
+export function Router() {
+  return (
+    <Routes>
+      <Route path="/" element={<DefaultLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/history" element={<History />} />
+      </Route>
+    </Routes>
+  )
+}
+nos passamos ele para o / porque queremos aplicar isso para todas as rotas.
+se a gente tiver layouts diferentes a gente pode fazer outra route com um path diferente para todas as rotas que tem esse path vao ter um outro layout que podemos criar.
+se a gente tiver uma rota dentro da outra vai ser a soma dos paths dela para acessar a filha.
+
+
+
 
 
 
