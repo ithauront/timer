@@ -365,6 +365,66 @@ vamos na no header e vamos modificar a ancora do link por um componente do react
     podemos usar esse active para fazer uma estilização do link. no caso vamos colocar um green-500 na classe active. isso quer dizer que o icone da pagina em que estivermos vai ficar verde.
     se ligar que o &:hover e o &.active tem que ficar dentro da tag de estilização do a. 
 
+# pagina header
+vamos para a nossa pagina home e vamos criar uma pasta para ela assim fizemos para tudo que tem estilização
+e renomear o home para index
+vamos fazendo esse index com os elementos que devem aparecer em tela. i formulario o conunt etc. e nglobamos todos eles em uma div ate acharmos algo melhor para englobar.
+fazendo o form
+colocamos o vou trabalhar em como label para que quando seja clidado ja de focus na parte que o usuario vai preencher (o input).
+vamos tambem criar o input e para trabalhar com a label a gente coloca no input o id task e na label htmlfor"task' fazemos outra label para a duração e um span para o fim da frase com a palavra minutos.
+abaixo do formulario vamos ter o countdown
+* countdown
+uma div englobando. 
+dois spans para o tempo em minutos
+um span para o dos pontos e mais dois spans para os 00 dos segundos.
+essas formataçoes depois vão mudar. por enquanto so queremos fazer o visual.
+* button
+para finalizar vamos er o botão para iniciar parar etc.
+esse butão vai dar o submit no form então precisamos que o formulario na verdade fique e volta de tudo, incluse dos spans de tempo e do butão. e por isso tambem vamos envolver as labels e tudo mais do form em uma div para podermos estilizar elas juntas
+colocamos no botao o icone do play do phosphor.
+a home ficou assim. agora vamos estilizar
+import { Play } from 'phosphor-react'
+
+export function Home() {
+  return (
+    <div>
+      <form action="">
+        <div>
+          <label htmlFor="task">Vou trabalhar em</label>
+          <input id="task" />
+
+          <label htmlFor="minutesAmount">durante</label>
+          <input id="minutesAmount" type="number" />
+
+          <span>minutos.</span>
+        </div>
+
+        <div>
+          <span>0</span>
+          <span>0</span>
+          <span>:</span>
+          <span>0</span>
+          <span>0</span>
+        </div>
+
+        <button type="submit">
+          <Play size={24} />
+          Começar
+        </button>
+      </form>
+    </div>
+  )
+}
+
+
+styles home
+fazemos as consts para a home container para o form container para o cowntdown container e tambem para o button. la no index no lugar da div que engloba tudo vamos colocar a HomeContainer importando do styles. dentro do form vamos importar a form container dentro do countdown a do countdown e etc
+na estilização do homecontainer vamos colocar os basicos de posicionalente e vamos estilizar o form dentro dela. abrindo  tag form{}. nessa estilização a gente alignou o form com o coutwdoan e button ao centro e colocamos um espaçamento neles.
+na estilização o form nos fazemos o basico de posicionamento e cor e colocamos um flexwrap. o flexwrap funciona para se a tela for menor ele quebrar o formulario em varias linhas.
+para o countDown vamos usar a outra font a roboto mono
+vamos criar um componente extilisado apenas para estilizar o dois pontos no meio do countdown. estipizamos ele e trocamos a span que estava entre o : pelo importado sperator.
+
+
 
 
 
