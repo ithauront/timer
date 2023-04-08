@@ -451,6 +451,26 @@ ou seja criamos um componente de base para estilizar outras coisas
 apos fazer as configuraçoes de base nos vamos para os inputs especificos
 fixamos o tamanho do input minuts q é menor. e para que o outro ocupe o maximo de espaço possivel a gente da pra ele a propriedade flex 1. essa prorpiedade faz com que como o container tem display flex o flex um é um atalho para setar tres propriedade flex o grwoth que fica como sim e da caracteristica de permitir o componente crescer. o flex shrink que da a possibilidade de diminuir e flex bases que é o tamanho ideal do elemento. colocando o 1 ele diz que vai caber no espaço mas vai aumentar o espaço oi diminuir se precisar.
 agora voltamos para o input base para estilizar o placeholder com &::placeholer{}
+* aprimorando os inputs com html
+na parte de minutos por exemplo vamos impedir que ela coloque 999999 e tambem vamos fazer com que ela não precise subir na seta de um em 1.
+por exemplo em inputs do tipo numero nos podemos passar para ele o step assim ele sobe em mais de um a um. no html tradicional a gente tem que colocar a propriedade step como uma string, mas no react a gente pode botar como um numero então a gente bota step={5} por exemplo podemos definir os vamores minimos e maxims com a propriedade min e max.
+no input de texto podemos colocar sugestoes de coisas que ja digitamos anteriormente.
+vamos fazer uma datalist apos o tad de input de texto. passamos um id para damos as options e o id passa para a propriedade list do form. fica assim
+<FormContainer>
+          <label htmlFor="task">Vou trabalhar em</label>
+          <TaskInput
+            id="task"
+            placeholder="Dê um nome para o seu projeto"
+            list="taskSugesion"
+          />
+          <datalist id="taskSugestion">
+            <option value="Projeto 1" />
+            <option value="Projeto 2" />
+            <option value="Projeto 3" />
+            <option value="Banana" />
+          </datalist>
+porem isso vai gerar uma flecha feita no textarea . a gente pode tirar isso no css indo no taskInput e coocando um &::-webkit-calendar-picker-indicator{display: none !important;}
+          
 
 
 
