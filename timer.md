@@ -470,6 +470,18 @@ vamos fazer uma datalist apos o tad de input de texto. passamos um id para damos
             <option value="Banana" />
           </datalist>
 porem isso vai gerar uma flecha feita no textarea . a gente pode tirar isso no css indo no taskInput e coocando um &::-webkit-calendar-picker-indicator{display: none !important;}
+
+#history
+vamos fazer nosso historico
+na pasta historico abrimos o style.ts tambem
+driamos no index uma tabela com o html usando table/ thead tr t e tbody. e vamos estilizar as coisas
+a gente criou uma div envolta da tabela pq quando estiver no cel e a tela estiver menor o usuario possa dar scrol na tabela. e para isso a gente estiliza apenas a div que esta em volta da tabela dessa forma
+export const HistoryList = styled.div`
+  flex: 1;
+  overflow: auto;
+  margin-top: 2rem;
+`
+vamos voltar para o history container e abrimos a tag da table para estilizar ela da forma que queremos agora que a div ja estilizou a questão de rolagem. o border collapse serve para quando a gente coloca borda de 1px por exemplo em dois elementos lado a lado ele conta 1px de cada um e fica visualmente uma borda de dois pixeils com o colapse ele conta uma colapsando a outra e fica so uma borda de um px entre eles.
           
 
 
