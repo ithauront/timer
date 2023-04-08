@@ -423,6 +423,34 @@ na estilização do homecontainer vamos colocar os basicos de posicionalente e v
 na estilização o form nos fazemos o basico de posicionamento e cor e colocamos um flexwrap. o flexwrap funciona para se a tela for menor ele quebrar o formulario em varias linhas.
 para o countDown vamos usar a outra font a roboto mono
 vamos criar um componente extilisado apenas para estilizar o dois pontos no meio do countdown. estipizamos ele e trocamos a span que estava entre o : pelo importado sperator.
+o overflow hiden que a gete botou é" uma propriedade que determina o comportaento do elemento quando o seu conteudo excede o tamanho da box na qual ele esta inserido. com o hiden o que esceder o tamanho da box não sera mostrado. outras propriedades sao visible scroll e auto.
+* button
+ a gente poderia estilizar o button dentro do form que esta dentro da main na pagina de estilização. porque o button faz parte do form. seria so colocar a tag button:submit{}. porem ao usar styled componentes é melhor evitar usar muita cascata e sim criar novos componentes estilizados. enão vamos usar o nosso buton que a gente tinha criado. assim 
+ export const StartCountdownButton = styled.button``
+ e la no index a gente troca a tag button pela startcontdownbutton assim
+ <StartCountdownButton type="submit">
+          <Play size={24} />
+          Começar
+        </StartCountdownButton>
+        e vamos estilizar ele
+      damos um hover e um disabled para o botao tambem e colocamos o hoover para so acontecer se ele não estiver disabled assim
+      &:not(disabled):hover{}
+
+* input style
+os nossos inputs tem taman,hos diferentes precisamos que um se expanda. por isso temos wq aplicar estilos diferentes
+ amos fazer dois componentes estilizados. UM PRA CADA
+ como os dois inputs tambem vao ter muita estilização compartilhada a gente pode criar uma const que não vamos importar chamada baseInput que vai ser styled.input os outros dois que vao usar as bases do baseinput nos vamos colocar styled(baseInput). o conjunto fica assim
+ const BaseInput = styled.input`
+  background: transparent;
+`
+export const TaskInput = styled(BaseInput)``
+
+export const MinutesAmountInput = styled(BaseInput)``
+ou seja criamos um componente de base para estilizar outras coisas
+é bom saber que o input não herda o fontsize do container por isso temos que colocar o fontsize nele tambem. outra solução é passar o font-size inherit. que ai ele herda.
+apos fazer as configuraçoes de base nos vamos para os inputs especificos
+fixamos o tamanho do input minuts q é menor. e para que o outro ocupe o maximo de espaço possivel a gente da pra ele a propriedade flex 1. essa prorpiedade faz com que como o container tem display flex o flex um é um atalho para setar tres propriedade flex o grwoth que fica como sim e da caracteristica de permitir o componente crescer. o flex shrink que da a possibilidade de diminuir e flex bases que é o tamanho ideal do elemento. colocando o 1 ele diz que vai caber no espaço mas vai aumentar o espaço oi diminuir se precisar.
+agora voltamos para o input base para estilizar o placeholder com &::placeholer{}
 
 
 
