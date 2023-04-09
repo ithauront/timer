@@ -482,6 +482,56 @@ export const HistoryList = styled.div`
   margin-top: 2rem;
 `
 vamos voltar para o history container e abrimos a tag da table para estilizar ela da forma que queremos agora que a div ja estilizou a questão de rolagem. o border collapse serve para quando a gente coloca borda de 1px por exemplo em dois elementos lado a lado ele conta 1px de cada um e fica visualmente uma borda de dois pixeils com o colapse ele conta uma colapsando a outra e fica so uma borda de um px entre eles.
+
+# status
+no status tem uma bnolinha que muda de cor caso o status esteja em andamentos, concluido, interrmpido etc. nos vamos adicionar essa bolinha com as cores agora. o status é uma das colunas do historico.
+vamos criar um componente novo para a flag do status. mas temos que pensar que quando estamos usando o styled components, cada vez que formos criar um componente novo so porque algo é VISUALMENTE  diferente, não significa que aquilo precisa ser um arquivo novo. a gente pode fazer esse componente dentro do styles.
+vamos então criar o componente status
+
+export const Status = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`
+nos colocamos flex e align itens mesmo dentro do status so tendo um texto, teoricamente não gteria o que alinhar e o que colocar em gap. porem dentro do css podemos adicionar elementos novos com o
+* ::before ou ::after
+ assim adicionando elementos antes ou depois. e poor isso colocamos a gap.o before e after ficam dentro da tag em questão como a primeira ou a ultima coisa. se a gente quer que ele fique na tela visualmente nos tempos  que passar um conteudo, content="" mesmo que esse content seja em branco.
+ com esse before a gente conseguiu criar a bolinha no css
+ export const Status = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: ${(props) => props.theme['yellow-500']};
+  }
+
+  apesar do status ser um comppon,ente de estilo nos podemos repassar propriedades para ele. para isso temos que criar uma interface para ele dizendo que propriedades ele pode receber.
+  interface StatusProps {
+  statusColor: 'yellow' | 'red' | 'green'
+}
+e no export const temos que passar o props assim export const Status = styled.div<StatusProps>`
+
+agora temos que ir no index e passar a propriedade para todos os status porque ela é obrigatoria. o index fica assim <Status statusColor="green"> Concluido </Status>
+
+agora vamos criar um objeto para mapear as cores que a gente usou na status props no rgb. e assim ele saber o que o yellow red e green significam. orque por enquanto a bola so esta dando amarela porque ela esta na background color.
+como a yellow vem do tema ela tem que ser variavel, por isso ao invez de a gente criar uma cor com o #060606 por exemplo nos vamos usar uma string que vai puxar la do nosso tema a yellow-500 e la na passagem do background do &::before a gente vai ter que passar que o props.theme vai buscar do status_color o que vai ser enviado pelo statusColor. dessa forma: background: ${(props) => props.theme[STATUS_COLOR[props.statusColor]]};
+
+porem para isso funcionar a gente tem que passar o STATUS_COLOR com o "as const" dessa forma
+const STATUS_COLOR = {
+  yellow: 'yellow-500',
+  red: 'red-500',
+  green: 'green-500',
+} as const
+ esse as const significa que a string que esta sendo definida para cada um (yellow green e red) nunca vai mudar. ela sempre terq que ser yellow-500 red-500. porque ai ele verfica se tem essas strings la no default theme e ve que tem. qo contrario de antes que ele via apenas como uma string que poderia estar ou não la.
+ agpra podemos mudar tambem o statusColor para dizer para ele que as cores disponiveis vão ser as keys do STATUS_COLOR porque so vao ser essas mesmo que vao ser disponiveis. a interface fica assil
+ interface StatusProps {
+  statusColor: keyof typeof STATUS_COLOR
+}
           
 
 
