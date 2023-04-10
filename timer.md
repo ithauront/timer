@@ -669,6 +669,26 @@ mas podemos ainda criar umas variaveis auxiliares que são variaveis que não va
 por exemplo a nossa const task = watch('task') a pessoa vai ter que correr ate o fim do cogido para entender porque fizemos isso.
 então a gente pode criar uma variavel chamada isSubmitDisabled = !task e la embaixo a gente usa a variavel isSubmitDisable. assim a pessoa que ler vai saber logo quando pegar que essa watchTask é para desabilitar o submit quando a task não estier presente.
 
+# validando formulario
+nosso formulario tem o botão desabilitado ate que a pessoa escreva algo. mas podemos tambem deixar o botão habilitado e caso a pessoa não escreva nada valido qo clicar no botão aparecer algo que indique que deve ser preenchido.
+o react hook form não traz nada de validação por padrão. ele se mantem uma biblioteca mais enxuta e e utiliza de outras bibliotecas feitas para validaão de forma integrada. 
+uma dessas bibliotecas é a yup lib js  outra seria a joi lib js ou a zod lib js
+todas muito semelhantes
+vamos pegar a zod porque ela se integra um pouco mais com o typescript
+npm i zod
+e para integrar com o hook form temos que instalar o resolvers dessa forma
+npm i @hookform/resolvers
+e ai vamos importar o zodResolver nessa integração dessa forma  no index
+import { zodResolver } from '@hookform/resolvers/zod'
+e vamos tambem importar o zod from zod
+mas como o zod não tem o export default a gente tem que importar cada função dele que fossemos usar semaradamente ou então importar tudo e dar um nome para isso com uma tecnica do ecma. ficaria assim
+import * as zod from 'zod'
+agora nos vamos passar um objeto de configuraçoes para o useForm e nesse objeto nos vamos usar um resolver de validação que é o zodResolver e para dentro do zod resolver a gente tem que passar qual é nosso esquema de validação. por exemplo a gente pode dizer que a task é uma string e precisa ter pelo menos 4 caracteres. o minutosAmount tem que ser um numero maior que 3, e por ai vai. 
+para isso vamos criar um objeto chamado newCycleFromValidationSchema = zod.object({}) chamamos de schema porque essas bibliotecas são schemabased que é um formato de validação. é um objeto porque o data vem em formato de objeto.
+dentro desse objeto vamos definir o task como um zod.string().min(1, 'informe a tarefa) ou seja é uma string com min,imo de um caracter e o segundo argumento do min é para caso o crequisito minimo não seja validado o que ele vai dar de mensagem para que o usuario entenda. vamos fazer igual para os numeros.
+agora que ja temos o esauema de validação vamos passar isso para o zodResolver e ele vai entender isso como necessario para a validação.
+
+
 
 
 
