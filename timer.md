@@ -533,6 +533,144 @@ const STATUS_COLOR = {
   statusColor: keyof typeof STATUS_COLOR
 }
           
+# form
+coisas importantes para o formulario
+* validação (impedir que valide sem preencher ou preenchendo errado)
+* monitorar o preenchimento dos campos
+
+existem dois modelos de trabalho para os formularios o controled e o uncontrold
+* controled
+manter em tempo real o estado dentro de uma ariavel no componente (um estado) sempre que uma nova informação é escrita a gente atualiza o valor do estado. 
+se a gente fosse fazer nossa app nesse formato a gente teria um estado
+import { useState } from 'react'
+
+export function Home() {
+  const [task, setTask] = useState('')
+
+  return (
+    <HomeContainer>
+      <form action="">
+        <FormContainer>
+          <label htmlFor="task">Vou trabalhar em</label>
+          <TaskInput
+            id="task"
+            placeholder="Dê um nome para o seu projeto"
+            list="taskSugestion"
+            onChange={(e) => setTask(e.target.value)}
+            value={task}
+          />
+a gente cria o estado task e faz o onChange na task. asim a cada mudanca a gente pega o target.value desse input e atualiza o setTask.
+e o value fica sendo o valor do estado. assim atualizamos vizualmente o valor desse imput para o que foi digitado. caso a gente atualize ou resete os campos ele apagaa o value.
+isso é controled component a gente esta monitorando a todo momento e vai atualizando a informação
+beneficios - nos temos facilmente ter acesso aos valores quando a gnete fazo submit e podemos por exemplo habilitar o botão assim que algo é digitado na task. o controled component traz fluidez para o app.
+maleficios - o react sempre que fazemos atualização de estado provocamos uma nova renderização ou seja quando mudamos lgo no estado o react recalcula todo o conteudo do componente do estado que mudou. então se a gente tiver uma interface com muitas atualizaçoes isso pode fazer com que a app fique mais lenta.
+
+* uncontrolled
+nesse modelo a gente busca a informação do valor do input somente quando precisarmos dela.
+a gente tiraria o onChange e colocaria dentro da tag form um onSubmit para pegar o estatus usando uma função de handleSubmit
+export function Home() {
+  function handleSubmit(event){
+    event.target.task.value
+ 
+  }
+  a gente coloca como parametro da função o evento. e ai a gente pega usando o event.target.task(que é o nome do form).value e ai com isso a gente pega o valor la e podemos trabalhar com ele.
+  - vantagens
+  a gente ganha em performace
+  - desvantagem
+  a gente perde fluidez e so tem acess ao valor uma vez que ele é finalizado com o valor submit.
+
+  # biblioteca de formularios
+  para fazer os forms funcionarem nos vamos usar uma biblioteca de formularioos do react chamada react hook form
+  ela trabalha tanto de forma controled quanto uncontroled.
+  temos performace e fluidez ao mesmo tempo.
+  a gente vai instalar ela usando o npm i react-hook-form
+  agoraimportamos ela na nossa pagina e importamos dentro dela a função useForm 
+  vamos chamar essa função dentro da home e essa função devolve um obketo com varias informaçoes que podemos usar para criar nosso formulario. por isso podemos usar da desetruturação nela usando uma const {} = useForm ,e se a gente der um contro espaco a gente consegue ver varias funçoes que a gente pode usar de dentro dela as mais importantes são a register e a handleSubmit
+  register - vé um medoto que vai adicionar um input ao nosso form. a gente cria um novo formulario na nossa aplicação.
+  vamos pegar os nossos input que ja criamos do nosso formulario, vamos dar um enter depois do ultimo vamos abrir um objeto e dentro dele dar ...register('task') como o register é uma função a gente abre parametros e da um nome para o input, nesse caso escolhemos task.
+  agora podemos tirar o name='task' porque ele esta repetido.
+  o register é uma fiunção que recebe o nome do input e retorna alguns metodo que sao os metodo que utilizamos para trabalhar com input no javascript como o onChange, o onBlur, onFocus, etc. por ela retornar varios metodos a gente usa o spreadoperator para transofrmar cada metodo que ela retorna em um atributo ou propriedade para podermos usar no input.
+  vamos fazer a mesma coisa no minutesAmount mas no segundo argumento a gente pode passar parametro de configuração e um deles é uma propriedade chamada value has number. e com esse ele vai ler o que esta la como um nomber que passamos true ou flase, nesse caso true pq queremos que seja um numero e não como ua string que é o padréo fica assim
+   {...register('minutesAmount', { valueAsNumber:true })}
+  no nosso formulario na parte de onSubmit nos vamos passar a handleSubmit que veio do useForm
+  criamos uma função chamada handleCreateNewCicle.
+  e passamos para o handleSubmit que esta dentro do onSubmit a função handleCreateNewCycle
+  podemos receber como argumento da função cycle um data e o data ele ja sabe que é o value dos inputs.
+  com isso criamos o formulario, mas ainda precisamos fazer o disable para ser interativo.
+  para habilitar caso o valor de task for preenchido ou não podemos importar uma função chamada watch. para essa funcção watch nos vamos passar o campo task que foi o nome que demos dentro do register. e se a gente transformar isso em uma const chamada task a gente sabe o valor dela em tempo real. e agora la no botão podemos colocar o disble={!task} se não for task ele vai estar desabilitado. ou task.length != 0 qualquer coisa asim.
+  agora a pagina esta funcionando e ela fica assim:
+  import { Play } from 'phosphor-react'
+import {
+  CountdownContainer,
+  FormContainer,
+  HomeContainer,
+  MinutesAmountInput,
+  Separator,
+  StartCountdownButton,
+  TaskInput,
+} from './styles.js'
+import { useForm } from 'react-hook-form'
+
+export function Home() {
+  const { register, handleSubmit, watch } = useForm()
+
+  function handleCreateNewCycle(data: any) {}
+
+  const task = watch('task')
+  return (
+    <HomeContainer>
+      <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
+        <FormContainer>
+          <label htmlFor="task">Vou trabalhar em</label>
+          <TaskInput
+            id="task"
+            placeholder="Dê um nome para o seu projeto"
+            list="taskSugestion"
+            {...register('task')}
+          />
+          <datalist id="taskSugestion">
+            <option value="Projeto 1" />
+            <option value="Projeto 2" />
+            <option value="Projeto 3" />
+            <option value="Banana" />
+          </datalist>
+          <label htmlFor="minutesAmount">durante</label>
+          <MinutesAmountInput
+            id="minutesAmount"
+            type="number"
+            placeholder="00"
+            step={5}
+            min={5}
+            max={60}
+            {...register('minutesAmount', { valueAsNumber: true })}
+          />
+
+          <span>minutos.</span>
+        </FormContainer>
+
+        <CountdownContainer>
+          <span>0</span>
+          <span>0</span>
+          <Separator>:</Separator>
+          <span>0</span>
+          <span>0</span>
+        </CountdownContainer>
+
+        <StartCountdownButton disabled={!task} type="submit">
+          <Play size={24} />
+          Começar
+        </StartCountdownButton>
+      </form>
+    </HomeContainer>
+  )
+}
+
+mas podemos ainda criar umas variaveis auxiliares que são variaveis que não vao mudar a funcionalidade nem prejudicar a performance mas ajudam na legibilidade do codigo.
+por exemplo a nossa const task = watch('task') a pessoa vai ter que correr ate o fim do cogido para entender porque fizemos isso.
+então a gente pode criar uma variavel chamada isSubmitDisabled = !task e la embaixo a gente usa a variavel isSubmitDisable. assim a pessoa que ler vai saber logo quando pegar que essa watchTask é para desabilitar o submit quando a task não estier presente.
+
+
+
 
 
 
