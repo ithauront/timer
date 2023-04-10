@@ -688,6 +688,26 @@ para isso vamos criar um objeto chamado newCycleFromValidationSchema = zod.objec
 dentro desse objeto vamos definir o task como um zod.string().min(1, 'informe a tarefa) ou seja é uma string com min,imo de um caracter e o segundo argumento do min é para caso o crequisito minimo não seja validado o que ele vai dar de mensagem para que o usuario entenda. vamos fazer igual para os numeros.
 agora que ja temos o esauema de validação vamos passar isso para o zodResolver e ele vai entender isso como necessario para a validação.
 
+# typescript no formulario.
+o data do formulario esta como any. ele não consegue inferir qual a tipagem do formulario. a gente pode fazer um interface para isso. mas olhando nosso codigo a gente consegue se ligar que temos o input task que vai ser uma string e o input minutes que vai ser um number. o data vai ser um objeto com esses dois campos. podemos fazer na mão com o interface assim
+interface newCycleFormData {
+  task: string
+  minutesAmount: number
+}
+e passar essa interface como prom do data que esta na handlenewcycle
+ai ja poderemos usar o data.minutesAmount ou data.task.
+ 
+ so que no podemos tambem no useForm passar a propriedade para o objeto de configuração chamado defaultValues; e ela traz a possibilidade de a gente passar o valor inicial de cada campo. para que o useForm saiba que o defaultValue vai estar falando da task e da minutes amount a gente pode passar para ele usando os sinais de maior e menro logo apos ele (um generic) e dentro do generic passar a interface newCycleFormData
+ export function Home() {
+  const { register, handleSubmit, watch } = useForm<newCycleFormData >({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
+  }) 
+  assim com o em branco no task e o zero no minutes
+
 
 
 
