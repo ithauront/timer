@@ -708,6 +708,41 @@ ai ja poderemos usar o data.minutesAmount ou data.task.
   }) 
   assim com o em branco no task e o zero no minutes
 
+  agora tem uma interface ja funcionando para esse useForm.
+  mas a biblioteca zod tem uma integração boa com o typescript enão podemos ir mais longe.
+  so olhando para nossa const newCycleFormValidationSchema a gente consegue ver que vai ter no formulario um campo task que serve para string e um campo minutes que vai ser um number.
+  o zod então tem uma funcção dele que consegue extrair desse schema de validação uma tipagem para nosso formulario. dessa forma a gente não precisa criar a interface.
+  vamos fazer um type que vai ser igual ao zod.infer<typeOf newCycleValidationSchema> ( o infer que significa que o zod vai inferir o tipp isso automaticamente usando o que temos dentro do newCycleValidadionSchema precisamos usar o typeOf para que o typescript possa entender, porque não é algo nativo do javascript.)
+  fica assim a nossa substituição da interface
+  type newCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
+  e agora
+  // interface newCycleFormData {
+// task: string
+// minutesAmount: number
+// } ficou obsoleto por causa do type extraido do zod.
+
+# reset
+um ultimo ponto é que apos a gente clicar em comecar apos preencher o form ele vai disparar o nicio mas os campos do form vao continuar preenchidos.
+o react hook form tem uma função chamada reset que é feita para resetar os campos do form a cada vez que o submit seja acionado.
+basta a gente colocar a função resert() dentro do createnewcylce e chamando essa função como parametro la na cost que faz o useForm
+o reset volta os valores para os valores originais apenas dos campos que a gente colocou no defaultvalue. se a gente não colocar todos os campos no defaultValues ele não vai voltar esses.
+export function Home() {
+  const { register, handleSubmit, watch, reset } = useForm<newCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
+  })
+
+  function handleCreateNewCycle(data: newCycleFormData) {
+    console.log(data)
+    reset()
+  }
+  fica assim como esta assima o reset sendo chamado como função mas tambem declarado na cosnt do useform. so de colocar isso o reset ja vai funcionar.
+  
+
+
 
 
 
