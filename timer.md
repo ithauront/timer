@@ -796,6 +796,43 @@ outra alternativa é a gente manter um estado com o id do ciclo ativo
   essa const vai percorrer o array de estado cycles e vai encontrar um cyclo onde o id dele seja igual ao valor de activeCycleId.
   agora ja temos uma const que vai armazenar qual é o ciclo ativo e assim podemos usar ela.
 
+  # countdown
+uma das coisas importantes é que a pessoa coloca o tempo em minutos mas a gente tem que tranformar pra segundo. por exemplo a pessoa coloca um 5 la. a gente tem que fazer o programa interpretar que é na verdade 5*60 segundos
+vamos então criar uma variavel que vai converter o numero de minutos em segundos.
+vamos usar uma terciaria activeCycle ? activeCycle.minutesAmount * 60 : 0
+ou seja  se existit um ciclo ativo a const vai valer o numero de minutos vezes 60. se não tiver um ciclo ativo, vai ser zero.
+agora o nosso total seconds tem o tempo em segundos.
+agora como reduzimos de 1 em 1 segundo vamos criar um novo estado chamado
+const [amountSecondsPassed, setAmountSecondsPassed] = useState(0) 
+essa variavel vai armazenar o quanto de segundos foram passados assim a gente consegue reduzir o tanto de segundos que tinha menos no que ja passou e mostramos na interface isso.
+agora vamos criar uma nova variavel chamada currentSecods que vai fazer esse calculo
+vamos usar a terciaria de novo para ver se temos um cicloativo.
+const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0 
+vamos usar a const total de segundos que criamos menos o estado de quanto se passou.
+so que agora precisamos transformar o currentSeconds para uma forma que posamos mostrar em tela. que é minutos e segundos
+aqui tem o problema que se a gente so dividir o total de segundospor 60 sempre que não for um minuto inteiro vai dar um numero quebrado. então vamos ter que trabalhar com resto. 
+antes disso a gente pode arredondar a divisão para baixo, para caso seja um numero quevbrado ele dar o numero inteiro arredondando para baixo assim tendo o primeiro numero qiue vai aparecer no timer. para isso usamoso comando Math.floor(currentSeconds / 60) se a gente quiser que ele arredonde pra cima a gente usa Math.ceil e se a gente quiser que a mais de 0.5 seja pra cima e a menos seja pra baixo a gente usa o Math.round a const para o numero de minutos fica assim
+ const minutesAmount = Math.floor(currentSeconds / 60)
+ agora temos que fazer o seconds
+ temos que pegar o quanto temos de resto dessa divisão usando o operador de resto que é %
+ const secondsAmount = currentSeconds % 60
+
+ agora temos o numero de minutos e o numero de segundos nas nossas consts. so temos que colocar eles em tela.
+ porem nosos caracterres de segundo e minutos que são dois caracteres para cada;, são divididos em duas tags diferentes. porem se a gente quebrar os dois vai ter o problema de que quando chegar abaixo de de 10 ele vai ter um caracter so. para isso vamos ter que fazer uma nova variavel
+ que vai converter o minutsAmount de numero pra string e vamos usar uma coisa chamada .padStart() que é uma função que preenche o string ate um tamanhho especifico caso ela não tenha aquele tama,nho ainda com algum caracter de nossa escolha. então nos parametros a gente diz o tamanho de caracter que queremos que ter e no segundo argumento o que colocar caso não tenha. ele vai incluir no começo porque é é a função start. 
+ const minutes = String(minutesAmount).padStart(2, '0')
+  const seconds = String(secondsAmount).padStart(2, '0') 
+  e vamos fazer a mesma coisa com o seconds
+
+  agora pra mostrar em tela nos vamos la no span
+  <CountdownContainer>
+          <span>{minutes[0]}</span>
+        nesse caso a gente vai trabalhar a string como se fosse um array, pegando o que esta na prmeira posição.
+        e fazemos igual nos outros spans
+
+        agora quando damos iniciar o console ja mostra o tempo. porem ainda não reduz. temos agora que pensar como fazer para reduzir.
+
+# reduzir o tempo.
 
 
 
