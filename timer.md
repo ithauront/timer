@@ -726,7 +726,8 @@ um ultimo ponto é que apos a gente clicar em comecar apos preencher o form ele 
 o react hook form tem uma função chamada reset que é feita para resetar os campos do form a cada vez que o submit seja acionado.
 basta a gente colocar a função resert() dentro do createnewcylce e chamando essa função como parametro la na cost que faz o useForm
 o reset volta os valores para os valores originais apenas dos campos que a gente colocou no defaultvalue. se a gente não colocar todos os campos no defaultValues ele não vai voltar esses.
-export function Home() {
+export function Home
+agora vamos na handleCreateNewCycle e vamos criar um novo cyclo la.() {
   const { register, handleSubmit, watch, reset } = useForm<newCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
@@ -741,6 +742,60 @@ export function Home() {
   }
   fica assim como esta assima o reset sendo chamado como função mas tambem declarado na cosnt do useform. so de colocar isso o reset ja vai funcionar.
   
+  # iniciar um novo ciclo
+  vamos fazer a funcionalidade de do timmer
+  
+  a função handlecreatenewcycle precisa de um estado para que refletir que um novo ciclo se iniciou e a interface reaja.
+  vamos fazer uma const [ ] = useState() e importar o useState
+  vamos criar uma interface para definir o formato dos ciclos que vamos ter. vamos chamar essa interface de cycle
+  apesar de nos so termos um ciclo rodando a gente tem varios ciclos que ja rodaram. então é muito importante que a gente tenha um id nessa interface, para poder representar unicamente cada ciclo. nos vamos agora no nosso useState e vamos dizer que ele vai armazenar um array de ciclos com a interface que a gente criou. e vamos iniciar o estado com um array vazio. fica assim
+  interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+}
+
+export function Home() {
+  const [cycles, setCycles] = useState<Cycle[]>([])
+
+  uma solução pra fazer o id é a passar a data no milisegundo e converter para uma string. assim ele fica
+    id: String(new Date().getTime())
+    depois pegamos o task e minutos amount do data.
+    agora damos o setCycles para ser o estado anterior mais o novo.
+    fica assim:
+    function handleCreateNewCycle(data: newCycleFormData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    }
+
+    setCycles((state) => [...cycles, newCycle])
+    reset()
+  }
+  ja fizermos o estado mas ainda nao estamos usando ele pra nada.
+  agora temos que lembrar que temos uma lista de ciclos porem apenas um ativo. temos duas formas de sinalizar qual esta ativo. uma delas é adicionar ao interface uma propriedade chamada isActvie: boolean para indicar se esse é o ciclo ativo. o problema disso é que quando um novo ativo aparecer nos vamos ter que achar o antigo que estava ativo e colocar ele como falso
+.
+outra alternativa é a gente manter um estado com o id do ciclo ativo
+ const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+ a gente coloca compo tipo o string que é o tipo do id, mas tambem o null porque se não tiver nenhum ativo ainda não vai ter nenhum id. e vai ser null. e colocamos para iniciar o estado com null
+ agora, quando criamos um novo ciclo na handlecreatenewcycle nos vamos colocar para que i ciclo recem criado seja o ativo. setando o estado com o id do ciclo dessa forma
+ function handleCreateNewCycle(data: newCycleFormData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    }
+
+    setCycles((state) => [...cycles, newCycle])
+    setActiveCycleId(newCycle.id)
+    reset()
+  }
+  agora para mostrzr o ativo em tela vamos fazer uma nova const
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  essa const vai percorrer o array de estado cycles e vai encontrar um cyclo onde o id dele seja igual ao valor de activeCycleId.
+  agora ja temos uma const que vai armazenar qual é o ciclo ativo e assim podemos usar ela.
+
 
 
 
