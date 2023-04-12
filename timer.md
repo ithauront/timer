@@ -879,6 +879,60 @@ se a gente rodar iniciar um ciclo agora na aplicação ele ja funciona. porem te
 não tem nada pra limpar o cicle, então quando chega a zero ele continua rodando.
 se a gente iniciar um novo projeto ele buga porque ele tenta rodar os dois.
 
+# resolvendo alguns bugs
+temos uma variavel que anota o estado do total de segundos passados desde o inicio de um novo ciclo
+
+const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+e agora a gente altera a coisa calculando o tempo passado e o tempo do inici do ciclo dentro do intervalo de um segundo. 
+mas quando iniciamos um ciclo novo ele executa o codigo de novo.
+para evitar isso podemos usar o retorno do useeffect que vai ser sempre uma função , mesmo que uma arrow function. a responsabilidade do return é o seguinte. temos um intervalo rodando com o ciclo que criamos anteriormente. vada vez que executa ele cria um novo, nunca deleta. ent éao com o return a gente pode fazer uma limpeza.
+para isso temos que guardar o noso setInterval em uma variavel. e embaixo eu passo a função clearInterval(interval)
+porem como essa const interval é criada dentro do if cria um erro de escopo. o return não reconhece o interval; entéao temos que criar tambem a variavel interval fora. e no if a gente vai so chamar ela, ao inves de criar ela do zero. tem qiue ser uma let se não ela nao muda depois. e da problema.
+fica assim
+ useEffect(() => {
+    let interval: number
+    if (activeCycle) {
+      interval = setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate),
+        )
+      }, 1000)
+    }
+    return () => {
+      clearInterval(interval)
+    }
+  }, [activeCycle])
+
+  com isso a cada novo ciclo criado ele termina o anterior e o bug dos dois ciclos rodando ao mesmo tempo é resolvido.
+porem quando criamos o novo ciclo ele não começa do numero que a gente diz, e sim do numero quje a gente diz menos o que ja tinha sido passado do anterior. 
+isso esta acontecendo porque quando criamos um novo ciclo no handlecreate newcycle a gente não reseta o valor da variavel do state então na handle new cicle quando a gente estiver cuidado dos ciclos a gente pode colocar o setamount seconds passed de novo para zero a cada novo ciclo dessa forma
+
+ function handleCreateNewCycle(data: newCycleFormData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    }
+
+    setCycles((state) => [...cycles, newCycle])
+    setActiveCycleId(newCycle.id)
+    setAmountSecondsPassed(0)
+    reset()
+  }
+
+  podemos fazer uma nova funcionalidade
+  as vezes a aba que estamos não é essa, a gente pode mudar par ao hisotiroc e tal. então caso a gente esteja com o countdown rolando e estajamos em outra aba apareça o couwndoun na aba no titulo.
+  a gente faz um novo useEffect com dependencia nos minutos e segundos e dentro dele vamos atualizar o document.title = `${minutes}:${seconds}`
+  atualizamos para uma string contendo minutos : segundos.
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds}`
+    }
+  }, [minutes, seconds, activeCycle])
+  colocamos assim para so atualizar o titulo se tiver em ciclo ativo.
+  
+
 
 
 
