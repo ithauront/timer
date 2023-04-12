@@ -832,7 +832,52 @@ antes disso a gente pode arredondar a divisão para baixo, para caso seja um num
 
         agora quando damos iniciar o console ja mostra o tempo. porem ainda não reduz. temos agora que pensar como fazer para reduzir.
 
-# reduzir o tempo.
+# useEfect hook
+para aprender um pouco melnhor sobre o useEffect vamos ver uma aula onde ele faz um novo codigo so pra isso um codigo de um outro projeto que depois vamos descartar. 
+o useState tem o intuito de acoplarum funcionamento a um componente o useState vai armazenar variaveis que quando tem seu valor alterado provocam uma nova renderização.
+o useEffectHook recebe dois parametros, prileiro qual função vai ser executada, e o segundo parametro é quando
+Reassistia a aula do inicio!
+
+# reduzir o tempo no cronometro.
+
+uma das formas de reduzir o tepo seria usando o set interval. e o setTimeOut. porem o um segundo do set interval, é uma estimativa. ele não é preciso.
+principalmente se o pc estiver com processamento lento. 
+então como vamos fazer?
+quando criarmos nosso ciclo vamos salvar tambem qual foi a data usando o Date do javascript que vai horario tambem. então salvamos o horario que o timer começou.
+então temos que colocar isso no interface e no newCycle a gente joga o starDate como a data atual.
+function handleCreateNewCycle(data: newCycleFormData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+temos que mover a variavel do ciclo ativo para cima do useEffect
+      e agora dentro do codigo nos vamos criar um useEffect e dentro desse useEffect vamos criar um intervalo
+      queremos que se temos um ciclo ativo vamos dar um set interval a cada 1 segundo ou 1000 milisegundos e dentro do intervalo a gente vai colocar pra reduzir o tempo mostrado. a gente podia coloca uma atualização do estado do seconds passed para ir incrementando de +1 mas esse segundo do interval não é preciso.
+      so para saber a gente faria isso assim
+      setAmountSecondsPassed(state => state + 1)
+      mass vamos fazer de outra forma.
+      nos vamos comparar a data atual com a data que salamos no startdate e ver quantos segundos se passaram.
+      para isso temos que instalar o date fns
+      vamos no terminal e damos npm i date-fns
+      e dentro desse date fns a gente importa uma função que chama difference in seconds.
+      ai colocamos o setAmountSecconds passed para ser o differenceinSeconds da data atual para a data do inicio do cilco. a data mais futura sempre a gente coloca em primeiro parametro. no caso a atual. o agora.
+       e agora o eslint vai dizer que o array de dependencia do useEffect esta vazio. ou a gente remove ou a gente coloca algo para o hook depender disso para dar o start.
+  como a gente usa uma variavel externa (o actrive cylce) a gente tem que obrigatoriamente incluir essa variavel como ula dependencia do useEffect. e isso tambem implica que cada ve que o activecycle mudar o efeito colateral do useeffect vai ser chamado de novo. 
+      fica assim
+        useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate),
+        )
+      }, 1000)
+    }
+  }, [activeCycle])
+ 
+se a gente rodar iniciar um ciclo agora na aplicação ele ja funciona. porem tem alguns problemas ainda. 
+não tem nada pra limpar o cicle, então quando chega a zero ele continua rodando.
+se a gente iniciar um novo projeto ele buga porque ele tenta rodar os dois.
 
 
 
