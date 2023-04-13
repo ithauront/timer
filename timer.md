@@ -938,7 +938,22 @@ isso esta acontecendo porque quando criamos um novo ciclo no handlecreate newcyc
   la onde tem o botõ de iniciar um novo viclo nos vamos fazer um if. se o ciclo não estiver rolando vai ser como esta, se tiver um ciclo ativo nos vazemos o botão de interromper. vamos copiar o botão de inicio mas trocar o submit por um typebutton pa ele não vai fazer submit em nada. mudar o nome dele. tirar o disabled e colocar um onClick para a gente poder colocar algo pra acontecer quando clicarmos. e vamos tambem criar a estilização.
   vamos em estilos e pegamos o startCountDownButton para se inspirar.
    esse if vai ser feito com terciaria assim:
-  va
+ {activeCycle ? (
+          <StopCountdownButton type="button">
+            <HandPalm size={24} />
+            Interromper
+          </StopCountdownButton>
+        ) : (
+          <StartCountdownButton disabled={isSubmitDisabled} type="submit">
+            <Play size={24} />
+            Começar
+          </StartCountdownButton>
+  ou seja se activeCycle for estiver acontecendo ele mostra o stop button se não mostra o start. o onClick vai entrar depois para não dar erro.
+
+  outra coisa que podemos fazer é que se tiver um ciclo ativo não permitir que o usuario prencha um novo formulario. ele teria que interromper o ciclo antes. é so ir la no taskinput e colocar um disabled={activeCycle}  e tambem no minutes amount mas esse disabled precisa ser um boolean e ai da um erro (que não impede de rodar.) uma forma de resolver esse erro é colocar duas exclamaçoes dentro do disabled que ai ele converte o valor para boolean. se tiver algum valor no active cycle ele diz que é true se não tiver ele diz que é falso. assim o erro some. fica assim  disabled={!!activeCycle}
+  
+  vamos agora fazer a função para parar o ciclo e colocar ela no onClick do interromper
+  essa função vai setar o activeCycle de volta para null. e queremos tambem que ela anote se o ciclo foi interrompido pela metade ou se ele rodou até o fim.
 
 
 

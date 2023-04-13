@@ -30,6 +30,7 @@ interface Cycle {
   task: string
   minutesAmount: number
   startDate: Date
+  interruptedDate?: Date
 }
 
 export function Home() {
@@ -46,6 +47,19 @@ export function Home() {
   })
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  function handleInterruptCycle() {
+    setCycles(
+      cycles.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interruptedDate: new Date() }
+        } else {
+          return cycle
+        }
+      }),
+    )
+    setActiveCycleId(null)
+  }
 
   useEffect(() => {
     let interval: number
@@ -103,6 +117,7 @@ export function Home() {
             placeholder="Dê um nome para o seu projeto"
             list="taskSugestion"
             {...register('task')}
+            disabled={!!activeCycle}
           />
           <datalist id="taskSugestion">
             <option value="Projeto 1" />
@@ -117,6 +132,7 @@ export function Home() {
             placeholder="00"
             step={5}
             {...register('minutesAmount', { valueAsNumber: true })}
+            disabled={!!activeCycle}
           />
 
           <span>minutos.</span>
@@ -130,7 +146,7 @@ export function Home() {
           <span>{seconds[1]}</span>
         </CountdownContainer>
         {activeCycle ? (
-          <StopCountdownButton type="button">
+          <StopCountdownButton onClick={handleInterruptCycle} type="button">
             <HandPalm size={24} />
             Interromper
           </StopCountdownButton>
