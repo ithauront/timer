@@ -953,8 +953,89 @@ isso esta acontecendo porque quando criamos um novo ciclo no handlecreate newcyc
   outra coisa que podemos fazer é que se tiver um ciclo ativo não permitir que o usuario prencha um novo formulario. ele teria que interromper o ciclo antes. é so ir la no taskinput e colocar um disabled={activeCycle}  e tambem no minutes amount mas esse disabled precisa ser um boolean e ai da um erro (que não impede de rodar.) uma forma de resolver esse erro é colocar duas exclamaçoes dentro do disabled que ai ele converte o valor para boolean. se tiver algum valor no active cycle ele diz que é true se não tiver ele diz que é falso. assim o erro some. fica assim  disabled={!!activeCycle}
   
   vamos agora fazer a função para parar o ciclo e colocar ela no onClick do interromper
-  essa função vai setar o activeCycle de volta para null. e queremos tambem que ela anote se o ciclo foi interrompido pela metade ou se ele rodou até o fim.
+  essa função vai setar o activeCycle de volta para null assim não vai ter mais um ciclo rodando. e queremos tambem que ela anote se o ciclo foi interrompido pela metade ou se ele rodou até o fim. vamos então anotaruma nova data na interfacedo cliclo que vai ser a interruptedDate e colocar ela como opcional.
+  vamos pegar o setCycles que é onde os ciclos estão sendo armazenados e vamos percorrer todos os ciclos com o map e ver algumas opçoes.
+  se o cilco for o ciclo ativo. eu vou retornar todas as informaçoes dos ciclos e adicionar uma nova informação chamada interruptedDate como sendo a data atual. se não for eu retorno o ciclo se alteração.
+  function handleInterruptCycle() {
+      setActiveCycleId(null)
 
+      setCycles(
+        cycles.map((cycle) => {
+          if (cycle.id === activeCycleId) {
+            return { ...cycle, interruptedDate: new Date() }
+          } else {
+            return cycle
+          }
+        }),
+      )
+    }
+    fica assim
+    a gente ão pode mudar a imutabilidade por isso temos que fazer isso e percorrei todos os itens do array procurando o objeto que queremos mudar e retornar um novo array com ele alterado. o map é oimportante pq ele percorre o ciclo e retona cada ciclo alterado ou não. 
+  
+  agora temos que fazer algo para quando o ciclo chega à 0 o timer continua contando. temos que dar um jeito do ciclo parar e talvez dar um aviso. o nosso useEffect que pega calcula o tempo passado no timmer.
+  se a diferença em segundos entre o o inicio do ciclo e a data atual for igual ou maior do que o total de csegundos que o ciclo deveria ter significa que acabou.
+  vamos então colocar a diference in segonds dentro de uma const. e a gente passa essa const para o setAmountSecondspassed , para não mudar o funcionamento.
+  agora vamos fazer nossos ifs
+  vamos passar o total seconds const para cima do useEffect para poder ter acesso a ele e tambem como dependencia do useEffetc.
+  no nosso if vamos colocar que se a diferença em segundos for maior ou igual ao total de segundos vamos usar uma logica parecida com o do ciclo interrompido, so vamos mudar de interrupted cycle para finishedcycle e colocar esse oicional no interface. no else a gente coloca a atualisação do setAmountSecondsPassed. porque se o coisa terminou não precisa mais atualisar isso uma vez que vai estar zerado.
+  agora da um problema nas dependencias. temos que colocar o activecycleId e tambem a cycles. o active a gente pode colocar porem o cycles foi um erro que cometemos. a gente atualizava o estado como função então vamos corrigir isso para state nos dois casos.
+  function handleInterruptCycle() {
+    setCycles((state) =>
+      state.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interruptedDate: new Date() }
+        } else {
+          return cycle
+        }
+      }),
+    )
+    setActiveCycleId(null)
+  } vai ficar assim mudando o state e o programa sabe que o state vai cuidar do cycles.
+  quando a gente completa o ciclo a gente não quer que o intervalo continue executando. então damos tambem um clear interval la na useState apos o if e o else.
+  agora com isso funcionando quando chega no zero ele para mas continua mostrando 01 segundos. isso acontece porque quando o novo calculo de diferença é igual a gente não atualiza mais o quanto que passou, então ele para no ultimo que estava antes de chegar no igual.
+então dentro do if a gente pode dar um set setAmountSecondsPassed = totalSeconds
+o useEffect vai ficar assim
+useEffect(() => {
+    let interval: number
+    if (activeCycle) {
+      interval = setInterval(() => {
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate,
+        )
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id === activeCycleId) {
+                return { ...cycle, finishDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+          )
+          setAmountSecondsPassed(totalSeconds)
+          clearInterval(interval)
+        } else {
+          setAmountSecondsPassed(secondsDifference)
+        }
+      }, 1000)
+    }
+    return () => {
+      clearInterval(interval)
+    }
+  }, [activeCycle, totalSeconds, activeCycleId])
+
+  do jeito que esta ao terminar o ciclo ele fica zerado mas fica la com botão interromper e o from desabilitado. eu teste de colocar a linha de setActivecycle(null) depois da clearInterval para que dessa forma ao zerar tambem se habilitasse automaticamente o inicio de um novo ciclo. Funcionou mas eu não vou deixar ela porque estou seguindo o que ele esta fazendo na aplicação, talvez depois ele adicione essa funcionaidade.
+
+ainda vamos poder adicionar mais coisas como uma mensagem de sucesso ou outras coisas. porem o componente da home esta bem grande e complexo. por isso vamos separar ele em outros componentes para que fique de leitura mais facil e depois vamos melhorar ele.
+
+a gente pode perceber que por exemplo o nosso countdown timer la ele não precisa é independente do form e visseversa. a gente pode achar outras formas de iniciar o countdown que não seja o formulario assim desacoplando eles.
+então vamos criar duas pastas dentro da pasta home, uma chamada newCycleForm con dentro dela um index e um styles e outra camada countDown com os mesmos arquivos.
+vamos pegar o codigo html de todo o form container e jogar la dentro do newCycleform
+e vamos jogar no estilos tudo que esta relacionado ao form que esta no estilos da home. vai ficar uns erros mas por enquanto estamos so resolvendo a separação depois vamos olhar os erros.
+agora fazemos o mesmo com o countdown.
+agora vamos la no index da home e importamos o newCycleForm e o CountDown. podemos dentro da hme fazer uma pagina components e colocar esses dois componentes nela. a diferença entre os components que estao fora da home é que esses so vao ser usados na home por isso a pasta fica dentro da home enquanto os outros são globais e vao ser usados em varios lugares.
+o app não vai funcionar esta com bugs porque ainda precsamos separa a parte de fucnionamento tambem e tirar isso do indexhome e colocar nos components. porem ja separamos o visual e por isso vamos dar um commit.
 
 
 
