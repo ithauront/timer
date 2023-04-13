@@ -931,7 +931,14 @@ isso esta acontecendo porque quando criamos um novo ciclo no handlecreate newcyc
     }
   }, [minutes, seconds, activeCycle])
   colocamos assim para so atualizar o titulo se tiver em ciclo ativo.
-  
+
+  # mudanças na interface e ciclo rolando
+  temos qe mudar coisas na interface quando o ciclo estiver rolando.
+  primeira delas é que o botão tem que mudar de começar para interromper.
+  la onde tem o botõ de iniciar um novo viclo nos vamos fazer um if. se o ciclo não estiver rolando vai ser como esta, se tiver um ciclo ativo nos vazemos o botão de interromper. vamos copiar o botão de inicio mas trocar o submit por um typebutton pa ele não vai fazer submit em nada. mudar o nome dele. tirar o disabled e colocar um onClick para a gente poder colocar algo pra acontecer quando clicarmos. e vamos tambem criar a estilização.
+  vamos em estilos e pegamos o startCountDownButton para se inspirar.
+   esse if vai ser feito com terciaria assim:
+  va
 
 
 
