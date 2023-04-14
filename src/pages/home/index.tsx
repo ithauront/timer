@@ -4,9 +4,10 @@ import {
   StartCountdownButton,
   StopCountdownButton,
 } from './styles.js'
-
-import { createContext, useEffect, useState } from 'react'
-
+import { createContext, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as zod from 'zod'
+import { FormProvider, useForm } from 'react-hook-form'
 import { NewCycleForm } from './components/newCycleForm/index.js'
 import { CountDown } from './components/countdown/index.js'
 
@@ -23,17 +24,43 @@ interface cyclesContextType {
   activeCycle: Cycle | undefined
   activeCycleId: string | null
   markCurrentCycleAsFinished: () => void
+  amountSecondsPassed: number
+  updatedSecondsPassed: (seconds: number) => void
 }
 
 export const cyclesContext = createContext({} as cyclesContextType)
 
+const newCycleFormValidationSchema = zod.object({
+  task: zod.string().min(1, 'informe a tarefa'),
+  minutesAmount: zod
+    .number()
+    .min(4, 'o ciclo precisa ter no minimo 4 minutos')
+    .max(60, 'o ciclo precisa ter no maximo 60 minutos'),
+})
+
+type newCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
+
 export function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([])
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
 
   const activeCycle: Cycle | undefined = cycles.find(
     (cycle) => cycle.id === activeCycleId,
   )
+
+  function updatedSecondsPassed(seconds: number) {
+    setAmountSecondsPassed(seconds)
+  }
+
+  const newCycleForm = useForm<newCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
+  })
+  const { handleSubmit, watch, reset } = newCycleForm
 
   function markCurrentCycleAsFinished() {
     setCycles((state) =>
@@ -72,7 +99,7 @@ export function Home() {
     setActiveCycleId(newCycle.id)
     setAmountSecondsPassed(0)
     reset()
-  } // form
+  }
 
   const task = watch('task')
   const isSubmitDisabled = !task // variavel auxiliar, so para melhor leitura do codigo
@@ -80,9 +107,17 @@ export function Home() {
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
         <cyclesContext.Provider
-          value={{ activeCycle, activeCycleId, markCurrentCycleAsFinished }}
+          value={{
+            activeCycle,
+            activeCycleId,
+            markCurrentCycleAsFinished,
+            amountSecondsPassed,
+            updatedSecondsPassed,
+          }}
         >
-          <NewCycleForm />
+          <FormProvider {...newCycleForm}>
+            <NewCycleForm />
+          </FormProvider>
           <CountDown />
         </cyclesContext.Provider>
 

@@ -1183,6 +1183,52 @@ function markCurrentCycleAsFinished() {
   e enviamos essa função pelo contexto.
   la no interface diwemos que a markCurrentCycleAsFinished é uma função e o retorno é void passamos ela no value.
   agora no countdown a gente importa ele no context e chama ela colocando os parenteses depois. e chamamos ela no exato lugar onde estava o texto que a gene retirou.
+  
+  vamos agora pro form
+  primeiro tem o activeCycle que ja esta no contexto enão é so a gente pegar.
+  depois disso temos o problema dos metodos do useForm. o useForm esta dentro da aplicação porem os metodos watch handleSubmit e reset não são usados nesse componente, eles são usados no home.
+  então esse codigo que tem isso e toda a parte da validação poderia voltar para a home junto com suas importações. o problema agora é que o register nos vamos usar la no newcycle form. então temos que passar isso; podemos fazer tanto por context quanto por propriedade.
+  so que ela não tem muito a ver com o contexto dos ciclos ativos. a gente tenta manter no contexto coisas que tem a ver. a register tem muito mais a ver com o react hook form. mas não vamos enviar por propriedade tambem. porque o react hook form oferece pra gente um contexto proprio que a gente pode utilizar.
+  nos vamos pegar essa const
+   const { register, handleSubmit, watch, reset } = useForm<newCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
+  })
+  e trocar a desetruturação por um nome newCycleForm
+  mas como precisamos de algumas funçoes dele a gente faz essa desetruturação embaixo.
+   const { register, handleSubmit, watch, reset } = newCycleForm
+   é igual o que tinhamos antes mas agora agente tem acesso a variavel newCycleForm de forma colpmeta, selm desetruturar.
+   e agora a gente coloca um <FormProvider>e aqui dentro a gente chama o newCycleForm la embaixo na formatação html</FormProvider> fica assim
+       <FormProvider {...newCycleForm}>
+            <NewCycleForm />
+          </FormProvider>
+          <CountDown />
+        </cyclesContext.Provider>
+        o spread que esta no newCycleForm é o que pega cada uma das propriedades que esta la e passa como uma propriedade para o newCycleForm que vai pra outra pagina/.
+        a gente bota ele por volta do newCycleForm pq é so o newCycleForm que precisa dessas propriedades. agora na pagina do newCycleForm a gente pode pegar o register assim
+        export function NewCycleForm() {
+  const { activeCycle } = useContext(cyclesContext)
+  const { register } = useFormContext()
+  fazendo uma const que vai pegar o useFormContex e pegar o register de la de dentro. se a gente precisase a gente poderia pegar outras coisas tambem.
+  mas lembrando que o essa const so vai funcionar se o componente estiver envolto no formPROVIDER.
+  agora o titleForm não tem mais erros.
+  mas no index ainda temos a handCrateNewCycle() que atualiza o seconds passed para zero. e essa const secondspast não esta existindo pq ela precisa a variavel amount seconds passed que esta no countDown. a melhor forma de resolver isso e pegando esse state de la do contdown jogando de volta pra home e passando o amountSeconds passed para o context.
+  Agora não temos mais erros no home mas criamos um erro no countdown com o estado do amountSecondsPassed.
+para ter acesso a setAmountSecondsPassed a gente pode pensar na mesma historia de criar uma função para passar ela.
+então vamos novamente fazer um proxy dela/;
+
+function setSecondsPassed (seconds: number) {
+  setSecondsPassed(seconds)
+
+} 
+e no contexto vamos passar ela chamando de void
+passamos ela pelo contexto. no countdown a gente pega ela e troca a função setAmountSecondsPassed pela setSecondsPassed.
+essa função mais tarde vai mufar pq vamos mudar a logica.
+tava dando erro de loop infinito porque o nome setSecondsPassed ja estava sendo usado. mudei o nome para updatedSecondsPassed e funcionou.
+
 
 
 
