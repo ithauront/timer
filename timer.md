@@ -1036,7 +1036,153 @@ e vamos jogar no estilos tudo que esta relacionado ao form que esta no estilos d
 agora fazemos o mesmo com o countdown.
 agora vamos la no index da home e importamos o newCycleForm e o CountDown. podemos dentro da hme fazer uma pagina components e colocar esses dois componentes nela. a diferença entre os components que estao fora da home é que esses so vao ser usados na home por isso a pasta fica dentro da home enquanto os outros são globais e vao ser usados em varios lugares.
 o app não vai funcionar esta com bugs porque ainda precsamos separa a parte de fucnionamento tambem e tirar isso do indexhome e colocar nos components. porem ja separamos o visual e por isso vamos dar um commit.
+podemos perceber que algumas partes de nossas funcionalidade são completamente parte do nossos componentes. por exemplo o estado que registra quantos segundos passaram é completamente do countdown então podemos mover ele para la. 
+porem um problema vi surgir. porque as coisas passadas vão começar a precisar de coisas que tambem são necessarias no home então não podemos passar para la. como podemos resolver isso? talvez colocando essas coisas no app e passando como props para os dois??
+uma forma é passar as coisas como proriedades. podemos ir em countdown e fazer uma interface para activecycle e passar as porpriedades todas que vao ser usadas como props e tal para comunicar.
+so que acaba gerando o mesmo problema que a gente tinha tentado resolver que é o codigo ficar um pouco confuso por tanta propriedades estarem sendo passadas apenas para comunicação entre os componentes. o nome desse problema é propdrilling.
+então temos que achar uma solução melhor.
+resolveremos usando um conceito do react chamado
+# context API 
+ela permite compartilharmos informaçoes entre varios componentes ao mesmo tempo.
+o legal dela é que não precisa utilizar de propriedades, elas se tornam como informaçoes globais que todos os componentes podem ter acesso e todos os componentes podem modificar essas informaçoes e quando modificadas todos os componentes que dependiam ou dependem dessas informaçoes são atualizados.
 
+* vamos usar a context API porem todos os codigos de funcionalidades que passamos para as paginas newCYcleForm e countdown nos vamos er que tirar deas e passar para outro lugar (para a contextAPI eu acredito)
+
+vamos entender a contextAPI
+vamos criar um componente temporario para enteder melhor isso (fazemos isso porque o nosso app não esta funcioal por causa dos erros.). depois vamos deletar esse componente. vamos criar um novo home dentro do src
+com esse componente nos vamos simular uma pagina home e colocar ela pra aparecer no app e comentar as outras ue estavam dando erro.
+export function CountDown() {
+  return <h1>Countdown</h1>
+}
+export function NewCycleForm() {
+  return <h1>NewCycleForm</h1>
+}
+
+export function Home() {
+  return (
+    <div>
+      <NewCycleForm />
+      <CountDown />
+    </div>
+  )
+}
+ficou assim
+como a gente viu antes quando a gente não usa contexto a gente vaicriar uma variavel como actieCycle const activeCycle = 1 e ai a gente teria que enviar isso para ambos como se fosse propriedade.
+mas q gente quer evitar isso
+vmaos importar do react uma funcção chamada createContext e vamos armazenar o constexto nessa variavel. ai o nome dessa variavel tem que ter sentido e essa conts vai ser igual ao creatcontext e dentro dos parenteses da funcçao a gente coloca qual é o valor inicial desse contexto. então se vc vai armazenar uma unica variavel. a gente pode colocar um unica coisa como se o valor inicial do ciclo é 1 a gente pode botar so 1 ali e resolve. mas geralmente a gente utiliza contexto para guardar mais informaçoes então geralmete vamos colocar um objeto ai dentro do createContext
+agora para comunicar a gente vai na função que vai usar. passamos uma const com desetruturação do que a gente quer usar e essa cont é igual ao useContext(o nome do contexto que queremos.) fica assim
+const cyclesContext = createContext({
+  activeCycle = 1,
+})
+
+export function CountDown() {
+  return <h1>Countdown</h1>
+}
+export function NewCycleForm() {
+  const { activeCycle } = useContext(cyclesContext)
+  return <h1>NewCycleForm</h1>
+}
+
+fica sendo uma variavel que é compartilhada pelos dois componentes.
+porem se eu criar um botão que altere o ciclo ativo. quando eu alterar esse ciclo ao clicar
+<h1>
+      NewCycleForm: {activeCycle}
+      <button
+        onClick={() => {
+          activeCycle = 2
+        }}
+      >
+        Alterar ciclo ativo
+      </button>
+    </h1>
+  )
+  dessa forma ele vai reclamar que não podemos alterar porque é uma const mas mesmo que a gente mude para uma let quando a gente clicar nada vai mudar. Ou seja quando a gente cria um contexto a gente não pode mudar as informações. mas a gente quer mudar. então como fazer?
+
+  sempre que a gente tem ma variavel no react que vai ter o valor alterado com o tempo ela precisa ser um estado. e qaui ainda não estava como estado. vamos colocar esse estado dentro do home. isso porque a home é o componente que esta por volta dos outros dois. ou seja o componente pai. 
+  se a gente criasse isso dentro do countdown por exemplo o newCycleForm não teria acesso a esse estado. por conta de escopo.
+  agora por volta da div de retrno da home a gente vai botar um componente do react que vem de dentro do cyclesContext. o nome dele vai ser cyclesContext.provider como o cyclesContext vai pegar ser igual ao useContext ele vai receber essa propriedade do provider.
+  esse provider vai receber um valor. e nesse value eu preciso enviar quais informaçoes eu quero que sejam compartilhadas entre todos os componentes. geralmente vamos enviar um objeto com todas as inforçoes que queremos enviar.
+  colocamos as informaçoes quie queremos enviar e mudamos a tipagem do cyclescontext para ser any e a gente poder trabalhar melhor.
+  agora adicionamos o setActiveCycle em todos os lugares que vamos usar e podemos modificar ele no botão. agora quando modificamos ele no butão ele vai ser modificado em todos os lugares que tem esse estado.
+  agora podemos apagar nossa pagina home que fizemos esse teste mas antes vou colar ela aqui. e tambem ir la no app descomentar as coisas.
+  import { createContext, useContext, useState } from 'react'
+
+const cyclesContext = createContext({} as any)
+
+export function CountDown() {
+  const { activeCycle } = useContext(cyclesContext)
+  return <h1>Countdown: {activeCycle}</h1>
+}
+export function NewCycleForm() {
+  const { activeCycle, setActiveCycle } = useContext(cyclesContext)
+  return (
+    <h1>
+      NewCycleForm: {activeCycle}
+      <button
+        onClick={() => {
+          setActiveCycle(activeCycle + 1)
+        }}
+      >
+        Alterar ciclo ativo
+      </button>
+    </h1>
+  )
+}
+
+export function Home() {
+  const [activeCycle, setActiveCycle] = useState(0)
+  return (
+    <cyclesContext.Provider
+      value={{
+        activeCycle,
+        setActiveCycle,
+      }}
+    >
+      <div>
+        <h1>Home</h1>
+        <NewCycleForm />
+        <CountDown />
+      </div>
+    </cyclesContext.Provider>
+  )
+}
+
+vamos agora que apagamos isso tudo fazer a vera
+na home nos vamos criar o cyclesContext e impotar ele do react. e camos abrir uma interface cyclesContextType e ir aos poucos colocando nela o que a gente vai colocando dentro do ccycles context.
+tanto oform quando o countDown precisam do activeCycle então isso vai para o context.
+no objeto do cyclesContext a gente tem que colocar a tipagem dizendo que ele é {} as cyclesContextType
+se a gente nao fizer isso ele entende como um contexto vazio e isso da o problema de que quando q gente colocar esse componente por fora do dos outros que ele vai acessar, la no retorno
+   <cyclesContext.Provider>
+          <NewCycleForm />
+          <CountDown
+            activeCycle={activeCycle}
+            setCycles={setCycles}
+            activeCycleId={activeCycleId}
+          />
+        </cyclesContext.Provider>
+dessa forma.
+o probmlema é que se a gente tentar acessar o values do cycleContext.provider ele não sabe quais falores são dispo,nivels. com o as cycleContextType a gente tem acesso as propriedades ue tem la e ai a gente pode setar o value para active cycle assim
+<cyclesContext.Provider value={{ activeCycle }}>
+agora podemos remover as propriedades do countdown porque não vamos mais usar propriedades para comunicar./
+agora exportamos o nosso cyclesContext para la no countdown a gente poder acessalo.
+export const cyclesContext = createContext({} as cyclesContextType)
+agora vamos para o nosso countdown e vamos colocar uma contst {} = useContext(cyclesContext) agora dentro do objeto da const a gente ja consegue pegar o activeCycle
+agora vamos fazer o mesmo caminho para adicionar ao contexto o activeCycleId/
+para a setCycles que é uma fução a gente pode não enviar a funcção inteira para o contexto porque se enviamos tudo a gente tem que adicionar a tipagem dela no typescript que é bem grande.. podemos fazer de outra forma a gente ve o que a função que precisa do setCycles faz la no countdown. no home criamos uma função com o nome do que essa função faz. copiamos so a parte que usa os setCycle do countdown e colocamos nessa função no home.
+function markCurrentCycleAsFinished() {
+    setCycles((state) =>
+      state.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, finishDate: new Date() }
+        } else {
+          return cycle
+        }
+      }),
+    )
+  }
+  e enviamos essa função pelo contexto.
+  la no interface diwemos que a markCurrentCycleAsFinished é uma função e o retorno é void passamos ela no value.
+  agora no countdown a gente importa ele no context e chama ela colocando os parenteses depois. e chamamos ela no exato lugar onde estava o texto que a gene retirou.
 
 
 
