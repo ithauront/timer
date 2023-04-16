@@ -1229,6 +1229,227 @@ passamos ela pelo contexto. no countdown a gente pega ela e troca a função set
 essa função mais tarde vai mufar pq vamos mudar a logica.
 tava dando erro de loop infinito porque o nome setSecondsPassed ja estava sendo usado. mudei o nome para updatedSecondsPassed e funcionou.
 
+# contexto entre rotas
+ate o momnto o contexto esta funcionando entre os componentes que são apresentados na homePage. porem temos a pagina de historico que tambem precisa acessar as infrações dos ciclos para que ela possa gravar o que aconteceu.x  
+se fosse uma aplicação que comunicace com um backend não teria problma porque ai na pagina de historico a gente faria uma chaada para a API e puxaria o historico de la.
+nos precisamos de um jeito de compartivlhar a variavel cycles entre as duas paginas. para que o historico tenha acesso ao estado.
+(detalhe que o status do ciclo a gente vai conseguir a partir do interupted date ou finishedDate. se não tiver nenhul dos dois significa que ele ainda esta em andamento.)
+se a gente fosse usar a cyclesContext a gente teria que mover ele para algum lugar que ele ficasse por fora de todos as paginas (no caso acredito que o app). a gente moveria o context provider cyclesContext para o app, colocaria ele em volta das paginas. moveria tambem as variaveis de cicle para la. e tambem importaria do react o context provider . mas imagina se a gente for fazer isso para muitos codigos. iria ficar poluido o app por ter muitos codigos misturados de varios contextos.
+por isso podemos criar uma pasta separada para nossos contextos. 
+la vamos abrir um arquivo de cyclescontext e vamos colocar tudo que tem a ver com o cyclesContext nele
+e vamos nele colar a nossa exportação da const cyclesContext
+ export const cyclesContext = createContext({} as cyclesContextType) - com isso importar o createContext do react
+ vamos colar tambem a interface cycleContextType
+ interface cyclesContextType {
+  activeCycle: Cycle | undefined
+  activeCycleId: string | null
+  markCurrentCycleAsFinished: () => void
+  amountSecondsPassed: number
+  updatedSecondsPassed: (seconds: number) => void
+}
+vamos tambem colar a interface Cycle
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+  startDate: Date
+  interruptedDate?: Date
+  finishDate?: Date
+}
+e agora o contexto ta nessa pagina. mas ainda assim a gente teria que colocar o codigo do cycle dentro do app; então não ajudaria muito.. porem podemos de dentro do cyclesContet criar um componente chamado CyclesContextProvider e dentro dele eu ou colocar o cyclesContext.provider que a gente tinha feito na pagina home.assim
+  export function CyclesContextProvider() {
+  return (
+    <cyclesContext.Provider
+      value={{
+        activeCycle,
+        activeCycleId,
+        markCurrentCycleAsFinished,
+        amountSecondsPassed,
+        updatedSecondsPassed,
+      }}
+    ></cyclesContext.Provider>
+  )
+}
+e agora vamos trazer o codigo da home que tem esses valores que passamos ai para tirar esses erros.
+começamos pelas const
+export function CyclesContextProvider() {
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycle, setActiveCycle] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
+  ainda falta puxar algumas funçoes. depois de puxar todas fica assim
+  import { createContext, useState } from 'react'
+
+interface cyclesContextType {
+  activeCycle: Cycle | undefined
+  activeCycleId: string | null
+  markCurrentCycleAsFinished: () => void
+  amountSecondsPassed: number
+  updatedSecondsPassed: (seconds: number) => void
+}
+
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+  startDate: Date
+  interruptedDate?: Date
+  finishDate?: Date
+}
+
+export const cyclesContext = createContext({} as cyclesContextType)
+
+export function CyclesContextProvider() {
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycle] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  function updatedSecondsPassed(seconds: number) {
+    setAmountSecondsPassed(seconds)
+  }
+
+  function markCurrentCycleAsFinished() {
+    setCycles((state) =>
+      state.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, finishDate: new Date() }
+        } else {
+          return cycle
+        }
+      }),
+    )
+  }
+
+  return (
+    <cyclesContext.Provider
+      value={{
+        activeCycle,
+        activeCycleId,
+        markCurrentCycleAsFinished,
+        amountSecondsPassed,
+        updatedSecondsPassed,
+      }}
+    ></cyclesContext.Provider>
+  )
+}
+
+temos que passar a interfaceCycle para cima da outrra interfface porque ela usa a interface Cycle.
+
+Agora na home temos funçoes que usam esses contextos e elas estão quebradas.
+então para facilitar vamos mover as funçoes para dentro do contexto. mudar o nome delas e envia-las non nosso contexto interface
+agora por causa disso vamos ter que criar uma nova interface para taske minuts amount não compartilhamos a interface que esta no home porque ela esta em nivel diferente porque imagina que a gente quer acessar o contexto sem ser pelo formulario, ou se a gente quiser desacob=plar o zod e o reacthook form. o contexto tem que ser algo bem independente, por isso fazemos manualmente. PORQUE UM DIA A GENTE PODE MUDAR AS BIBLIOTECAS EXTERNAS E ASSIM NAO PRECIAREMOS MUDAR TANTO O CODIGO.
+o componente ficou assim
+import { createContext, useState } from 'react'
+
+interface CreateCycleData {
+  task: string
+  minutesAmount: number
+}
+
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+  startDate: Date
+  interruptedDate?: Date
+  finishDate?: Date
+}
+interface cyclesContextType {
+  activeCycle: Cycle | undefined
+  activeCycleId: string | null
+  markCurrentCycleAsFinished: () => void
+  amountSecondsPassed: number
+  updatedSecondsPassed: (seconds: number) => void
+  createNewCycle: (data: CreateCycleData) => void
+  interruptCurrentCycle: () => void
+}
+
+export const cyclesContext = createContext({} as cyclesContextType)
+
+export function CyclesContextProvider() {
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  function updatedSecondsPassed(seconds: number) {
+    setAmountSecondsPassed(seconds)
+  }
+
+  function markCurrentCycleAsFinished() {
+    setCycles((state) =>
+      state.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, finishDate: new Date() }
+        } else {
+          return cycle
+        }
+      }),
+    )
+  }
+
+  function createNewCycle(data: CreateCycleData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    }
+
+    setCycles((state) => [...cycles, newCycle])
+    setActiveCycleId(newCycle.id)
+    setAmountSecondsPassed(0)
+    // reset()
+  }
+
+  function interruptCurrentCycle() {
+    setCycles((state) =>
+      state.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interruptedDate: new Date() }
+        } else {
+          return cycle
+        }
+      }),
+    )
+    setActiveCycleId(null)
+  }
+
+  return (
+    <cyclesContext.Provider
+      value={{
+        activeCycle,
+        activeCycleId,
+        markCurrentCycleAsFinished,
+        amountSecondsPassed,
+        updatedSecondsPassed,
+        createNewCycle,
+        interruptCurrentCycle,
+      }}
+    ></cyclesContext.Provider>
+  )
+}
+
+so sobrou um erro nele que é o reset() por isso vamos deixar comentado por enquanto.
+agora nos vamos no app. e por volta do router nos vamos colocar esse componente assim ele vai compartilhar todas as informaçoes do cycle com tudo que passar pelo router, ou seja os componentesda home e os do historico.
+porem vai dar um erro. ele diz que o filho não tem propriedades em comum com os outros componentes. na verdae ele quer dizer que passamos um elemento dentro da tag e quando passamos algo dentro do componente temos que falar la no nosso componente de cycles provider no return onde que o conteudo que passamos como filho (no caso o router) vai aparecer. a gente chama isso de children.
+então la nas propriedades do exportFunciont do cyclesContent temos que colocar a propriedade children a gente vai criar ela la e o proprio react vai entender que isso ve do app e que o conteudo dela vai ser tudo que estiver no router. ai agora podemos chamar ela la no return como chidlren./
+export function CyclesContextProvider({ children }) {
+  fica assim e no return a gente coloca { chidlre } solto la.
+  ainda vai ficar um erro por conta do typesript e a i a gente pode criar uma interface CyclesContentProviderProps{
+    chidlren ReactNode
+  }
+nessa interface so vai receber o children e a tipagem a gente usa  no react uma chamlada reactNode.
+o node para o react significa qualquer tsx valido. qualquer coisa que seja valida escrito dentro do html .
+agora temos algiumas inmportaçoes para arrumar nos outros arquivos
+* countdown
+tirar a importação do cyclesContext vamos a e damos outro cntrl espaço no cyclesContext para ele achar o novo caminho.
+
+
+
 
 
 
