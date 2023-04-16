@@ -1446,7 +1446,27 @@ nessa interface so vai receber o children e a tipagem a gente usa  no react uma 
 o node para o react significa qualquer tsx valido. qualquer coisa que seja valida escrito dentro do html .
 agora temos algiumas inmportaçoes para arrumar nos outros arquivos
 * countdown
-tirar a importação do cyclesContext vamos a e damos outro cntrl espaço no cyclesContext para ele achar o novo caminho.
+tirar a importação do cyclesContext vamos a e damos outro cntrl espaço no cyclesContext para ele achar o novo caminho. isso ja arruma a pagina.
+* newCycleForm
+fazemos a mesma coisa apagando e reimportando.
+* Home
+agora vamos ter um pouco mais de erros aparecendo.
+logo abaixo do export function Home a gentevai fazer um const {} = useContext(cyclesContext) IMPORTANTE NÃO 2 CYCLESCONTEXTPROVIDER
+pegamos o cyclescontext somente.
+e ai dentro da desetruturação a gente pega as funçoes que precisamos fica assim
+export function Home() {
+  const {createNewCycle, interruptCurrentCycle} = useContext(cyclesContext)
+  agora fazemos o seguinte
+  no return handle submit a gente passa a createNewCycle e no button a gente passa a interupt
+  agora sobrou o erro do reset e do activeCycle. vamos pegar o activeCycle do contexto tambem.
+  o unico erro que ficou foi o reset. nos vamos comentar ele tambem para textar se o codigo esta funcionando.
+O codigo funcionou.
+
+agora o contexto pode ser acessado pelo historico porque ele esta por volta de todas as rotas. 
+agora para finalizar no cycles context vamos pegar a informação de ciclos adicionamos ela no contexto. e no value enviamos ela. 
+e aora no historico podemos abrir uma const {cycle} = useContext(CyclesContext) e pegar o cycle para trabalhar la no historico.
+agora temos acesso a nossa variavel de ciclos no historico. podemos inclusive jogar ele em um pre   <pre>{JSON.stringify(cycles, null, 2)}</pre>
+e agora la na pagina a gente pode ver formatado de uma forma ainda não estilizada o projeto iniciado a quantidede de minutos a data etc.
 
 
 
