@@ -1619,6 +1619,19 @@ por causa do && o react percebe que as condiçoes devem ser true para que ele re
  
  agora esta funcionnando mas ainda tem aquele problema de que quando termina ele não prepara de novo o timmer para fazer um novo ciclo como a gente tinha alterado e tiramos para não ficar diferente do dele.
  
+ # formatae a data
+ vamos importar a dateFNS na pagina do historic
+ e pegar um metodo dentro dela que chama formatDistanceToNow.
+ agora na chave que estava a nossa data  gente vai colocar esse metodo.
+ a gente chama o metodo. passamos a data do ciclo
+ <td>{formatDistanceToNow(cycles.startDate)}</td>
+ se a gente deixar assim, ele vai te dizer a quanto tempo iniciou. por exemplo a cinco minutos. so vai aparecer 5 minutos. se no segundo parametro a gente abrir um objeto e colocar addSufix: true. ai ele te diz a quanto tempo. por exemplo ha 2 minutos atras.
+ porem isso vai aparecer em ingles. temos então que importar o portugues do brasil assim
+ import ptBR from 'date-fns/locale/pt-BR'
+ agora podemos passar como um segundo atributo a lingua ptBR/ locale:ptBR
+ agora ja vai aparecer o tempoi de inicio em portugues.
+ e sempre que o tempo for passando ele vai atualizando aumentando o tempo, um dia, uma semana, etc.
+ 
 
 
 
