@@ -1509,7 +1509,116 @@ export function Home() {
     createNewCycle(data)
     reset()
   }
-  
+
+  # listagem dos ciclos no historicos
+   até o momentoa gente so tinha um json para ver se estava funcionando.
+   vamos la no historico e removemos isso. removemos tamvem todas as tr do tBoby e deixamos apenas uma.
+   aqui o json que tinhamos feito
+   <pre>{JSON.stringify(cycles, null, 2)}</pre>
+   aqui as tr que retiramos
+
+  <tr>
+              <td>Tarefa</td>
+              <td>20min</td>
+              <td>ha dois dias</td>
+              <td>
+                <Status statusColor="green"> Concluido </Status>
+              </td>
+            </tr>
+            <tr>
+              <td>Tarefa</td>
+              <td>20min</td>
+              <td>ha dois dias</td>
+              <td>
+                <Status statusColor="yellow">Em andamento </Status>
+              </td>
+            </tr>
+            <tr>
+              <td>Tarefa</td>
+              <td>20min</td>
+              <td>ha dois dias</td>
+              <td>
+                <Status statusColor="red"> Interrompido </Status>
+              </td>
+            </tr>
+            <tr>
+              <td>Tarefa</td>
+              <td>20min</td>
+              <td>ha dois dias</td>
+              <td>
+                <Status statusColor="green"> Concluido </Status>
+              </td>
+            </tr>
+
+            no local delas vamos colocar um objeto {cycles.map()} e para cada um dos ciclos la dentro nos vamos retornar uma tr dessas.
+            ou seja. nos vamos percorrer o array e cada vez que no array encontrarmos um cyclo (ou seja para cada posição do array qyue estiver ocupada) nos vamos retornar essa formatação html que fiwemos.
+            o codigo fica assim
+            {cycles.map(cycles => {
+              return ( <tr>
+              <td>Tarefa</td>
+              <td>20min</td>
+              <td>ha dois dias</td>
+              <td>
+                <Status statusColor="green"> Concluido </Status>
+              </td>
+            </tr>)
+            })}
+agora na tr precisamos passar a key. acho que podemos fazer com o cycles.id. 
+e depois vamos preenchendo cada parte com uma das caracteriticas de nosso cycles.
+sabendo que a data por enquanto vamos so colocar a startDate, mas futuramente provavelmente vamos trocar por algum calculo date.fns para dizer a quanto tempo ela foi criada.
+fica assim
+   {cycles.map((cycles) => {
+              return (
+                <tr key={cycles.id}>
+                  <td>{cycles.task}</td>
+                  <td>{cycles.minutesAmount} minutos</td>
+                  <td>{cycles.startDate.toISOString()}</td>
+                  <td>
+                    <Status statusColor="red"> Interrompido </Status>
+                  </td>
+                </tr>
+              )
+
+agora temos que fazer o status.
+  {cycles.finishDate && <Status statusColor="green"> Concluido </Status>   } quando so tem o then e não tem o else a gente pode usar os && para dizer que se tiver finishdate a gente vai mostrar isso. quer dier que o javascript so vai executar a segunda parte se a primeira for um valor verdadeiro um thruthy. se não for ele parte para a segunda opção se for verdadeiro ele executa o o que vem depois do && dela. se tambem não for verdadeiro ele executa a ultima opção. repare que como um if else, a ultima opção não tem condicional. porque o condicional dela é que as duas opçoes anteriores estejam falsas.
+  eu fiw assim mas não funcionou.
+    <td>
+                    {cycles.finishDate && (
+                      <Status statusColor="green"> Concluido </Status>
+                    ) ? (
+                      cycles.interruptedDate && (
+                        <Status statusColor="red"> Interrompido </Status>
+                      )
+                    ) : (
+                      <Status statusColor="yellow">Em andamento </Status>
+                    )}
+                  </td>
+        so deu como em andamento.
+  fiz como ele fez então no video que foi assim
+     <td>
+                    {cycles.finishDate && (
+                      <Status statusColor="green"> Concluido </Status>
+                    )}
+                    {cycles.interruptedDate && (
+                      <Status statusColor="red"> Interrompido </Status>
+                    )}
+                    {!cycles.interruptedDate && !cycles.finishDate && (
+                      <Status statusColor="yellow">Em andamento </Status>
+                    )}
+                  </td>
+      agora funcionou.
+
+      A primeira lógica não funcionou porque a expressão condicional ternária está sendo usada de maneira incorreta. A expressão condicional ternária é usada para avaliar uma condição e escolher um dos dois valores possíveis, dependendo se a condição é verdadeira ou falsa. Em seu código original, você usou a expressão ternária com três valores possíveis, o que é uma sintaxe inválida.
+
+Na sua primeira lógica, a expressão ternária está avaliando a condição cycles.finishDate, e se ela for verdadeira, ela exibe o componente <Status statusColor="green"> Concluido </Status>. Caso contrário, a expressão ternária tenta avaliar a condição cycles.interruptedDate, mas aí já ocorre um erro de sintaxe, porque não há mais uma opção "else" para a expressão ternária.
+
+Já na sua segunda lógica, você dividiu a lógica em três partes separadas: primeiro, você verifica se cycles.finishDate é verdadeiro e exibe o componente <Status statusColor="green"> Concluido </Status>; em seguida, você verifica se cycles.interruptedDate é verdadeiro e exibe o componente <Status statusColor="red"> Interrompido </Status>; finalmente, você verifica se nenhuma das condições anteriores é verdadeira e exibe o componente <Status statusColor="yellow">Em andamento </Status>. Essa lógica separada é mais clara e correta para o que você está tentando fazer.
+
+por causa do && o react percebe que as condiçoes devem ser true para que ele renderize o que vem em seguinda, se for false ele não faz nada e passa para a proxima linha.
+ tentar fazer com que a terceira linha do codigo se baseie nas condiçoes anteriores e não na ausensia de finish e interrupted date é uma forma de misturar as logicas no mesmo codigo. não é bom. porque nos começamos se baseando na presenca de algo dentro do cycles e terminamos fazendo referencia a nossas proprias condiçoes. ou a gente usa o if else desde o começo que se basea nas nossas condiçoes ou desde o começo usamos algo que se baseie nas na presenca de algo no cycles.
+ 
+ agora esta funcionnando mas ainda tem aquele problema de que quando termina ele não prepara de novo o timmer para fazer um novo ciclo como a gente tinha alterado e tiramos para não ficar diferente do dele.
+ 
 
 
 
