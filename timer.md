@@ -1468,6 +1468,48 @@ e aora no historico podemos abrir uma const {cycle} = useContext(CyclesContext) 
 agora temos acesso a nossa variavel de ciclos no historico. podemos inclusive jogar ele em um pre   <pre>{JSON.stringify(cycles, null, 2)}</pre>
 e agora la na pagina a gente pode ver formatado de uma forma ainda não estilizada o projeto iniciado a quantidede de minutos a data etc.
 
+# colocar o reset de volta
+o rest esta comentado tanto na home quanto no cyclesContext
+o negocio é que a gente não quer trazera biblioteca reacthook form para dentro do contexto. para não complicar se um dia a gente for mudar algo ou atualizar algo.
+então vamos tirar a função reset do contexto.  e para não mudar o funcionamento a gente vai criar uma segunda função na home para que o reset passe. e dessa forma podemos passar o reset como essa função da home/
+o rest tava nessa função do contexto
+ function createNewCycle(data: CreateCycleData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    }
+
+    setCycles((state) => [...cycles, newCycle])
+    setActiveCycleId(newCycle.id)
+    setAmountSecondsPassed(0)
+    // reset()
+  }
+  vamos criar a função handlecreateNewCycle.
+  porque o nome dessa é handle e da outra é so create?
+  - porque a handle a gente chama diretamente de um evento. isso é uma forma de padronização.
+  ai agora ao invez de chamar a createNewCycle que vem de la do contexto nos vamos chamar a handleCreateNewCycle e a função handl vai chamar dentro dela a createNewCycle do contexto. :)
+  ela recebe os dados que é a interface newFormData e ela chama a createnewCycle passando esses dados. e ela tambem em su segunda linha reseta o formulario. então depois de passar a createnewCycle ela da o reset. a função + o interface + a const de onde vem a reset fica assim
+  type newCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
+
+export function Home() {
+  const { activeCycle, createNewCycle, interruptCurrentCycle } =
+    useContext(cyclesContext)
+  const newCycleForm = useForm<newCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
+  })
+  const { handleSubmit, watch, reset } = newCycleForm
+
+  function handleCreateNewCycle(data: newCycleFormData) {
+    createNewCycle(data)
+    reset()
+  }
+  
 
 
 
