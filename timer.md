@@ -1631,8 +1631,66 @@ por causa do && o react percebe que as condiçoes devem ser true para que ele re
  agora podemos passar como um segundo atributo a lingua ptBR/ locale:ptBR
  agora ja vai aparecer o tempoi de inicio em portugues.
  e sempre que o tempo for passando ele vai atualizando aumentando o tempo, um dia, uma semana, etc.
- 
 
+ # reducer
+ os useReducer são uma funcionalidade do react. o use indica que é um hook.
+ eles são parecidos com o state. porque servem para armazenar uma informação e altera-la no futuro.
+ a gente prefere usar o useReducer para armazenar informações mais complexas que precisarao ser usadas no seu estado anterior e usando state nos teriamos codigos complexos para alteralo. principalmente quando a gente precisa altera-las no futuro.
+ o nosso array de ciclos por exemplo, a maioria das vezes que vamos alterar ele precisamos de um codigo mais complexo para alteralo.
+
+então poderemos criar umreducer para sipmlicficar a logica e tambem desacopla-la
+imagina se a gente precisar interromper o ciclo pr exemplo em diversos ugares da aplicação. da forma que temos agora vamos te que copiar o codigo e colar no lugar.
+mas com o reducer vamos ter um 'local' fixo para todas as alteraçoes que podem acontecer em cada local.
+vamos então criar um reducer dentro do provider do contexto. mas depois vamos mover isso para outro arquivo para ficar mais simples.
+vamos remover o use state e trocar para use reducer. então isso vai ficar assim
+era assim
+ const [cycles, setCycles] = useState<Cycle[]>([])
+ fica assim
+  const [cycles, setCycles] = useReducer(() => {}, [])
+  o use reducer recebe dois parametros. o primeiro é uma função. e o segundo é o valor inicial . e nos vamos colocar esse alor inicial como um array vazio;
+  Agora dentro dessa funç;éao ela vai receber 2 parametros. em primeiro o state que é o valor atual(em tempo real ) de nossa variavel de ciclos. e uma action. a action é qual ação o usuario esta querento realizar de alteração dentro de nossa variavel.
+  a action pode se chamar por exemplo um add, para sabermos que queremos adicionar algo, ou interupt para sabermos que queremos parar o ciclo ativo.
+  e dentro da função uma das primeiras coisas que nos vamos fazer é dar um return (state
+  fica assim)
+  const [cycles, setCycles] = useReducer((state, action) => {
+    return state
+  }, [])
+
+  vamos agora tipar esse state. falar qual vai ser o formato dele.
+  damos para o state a tipagem Cycle[] e dizemos que é um array/; essa tipagem ja tinha sido feita antes.
+  e na action por enquanto não vamos ter uma tipagem então por quenatnp vamos deixar ela como any.
+  agora como essa const vai ser para disparar um ciclo. vamos mudar o nome de setState para dispatch. porque é o nome que geralmente usamos para disparar algo.
+  dentro do dispatch a gente precisa colocar algo que faça ele distinguir uma ação da outra.
+  em oiutras palavras. quando eu chamar o dispatch assim
+  dispatch() dentro dos parenteses nos vamos incluir uma ação que vai substituir  a ação que a gente tinha colocado la como parametros do useReducer.
+  mas fica bem dificil dele destinguir o que ele quer. então dentro do dispatch nos vamos mandar um objeto e dentro desse objeto um type, com o nome ação que a gente quer realizar. e na segunda posição do objeto vamos mandar umoutr objeto chamado payload com os dados do novo ciclo. por exemplo
+  dispatch({
+    type: 'addNewCycle',
+    payload: {
+      data: newCycle
+    }
+  })
+
+  na função createNewCycle a gente faz isso e colocamos o dispatch para substituir a linha que foi comentada.
+   function createNewCycle(data: CreateCycleData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    }
+
+    dispatch({
+      type: 'addNewCycle',
+      payload: {
+        newCycle,
+      },
+    })
+
+    // setCycles((state) => [...cycles, newCycle])
+    setActiveCycleId(newCycle.id)
+    setAmountSecondsPassed(0)
+  }
 
 
 
