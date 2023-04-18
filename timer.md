@@ -1931,19 +1931,76 @@ export function CyclesContextProvider({
   )
 }
 
-PERCEBI UM BUG; SE DEIXAR O CODIGO RODAR ATE O FIM ELE NÃO SAI DO HISTORICO COMO FINALIZADO; FICA PRA SEMPRE EM ANDAMENTO;
+# separar actiontypes
+agora para melhorar um pouco a estrutura do programa vamos pegar a função que esta toda dentro do useReducer a que define os ciclos e todos os tipos de ação e vamos jogar ela em outro arquivo.
+vamos criar uma pata chamada reducers no src. e dentro delas um arquivo chamado cycles.tsx
+dentro desse arqcuivo vamos exportar uma função chamadacyclesReducer e dar um cntrlv no codigo copiado
+vamos tirar a flecha porque não é mais uma arrowfunction. e os outros erros são de tipagem. então vamos pegar as interfaces cyclesState, e a cycle e mover para la. porem como a cycle precisa em ambos arquivos nos vamos importar ela no cyclescontext.
+  e agora no useReducer do context a gente puxa a função que exportamos do reducer/cycle.
+  a pagina reducer 
+. a pagina vai ficar assim 
 
+export interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+  startDate: Date
+  interruptedDate?: Date
+  finishDate?: Date
+}
 
+interface CyclesState {
+  cycles: Cycle[]
+  activeCycleId: string | null
+}
 
+export function cyclesReducer(state: CyclesState, action: any) {
+  switch (action.type) {
+    case 'addNewCycle':
+      return {
+        ...state,
+        cycles: [...state.cycles, action.payload.newCycle],
+        activeCycleId: action.payload.newCycle.id,
+      }
+    case 'interuptCurrentCycle':
+      return {
+        ...state,
+        cycles: state.cycles.map((cycle) => {
+          if (cycle.id === state.activeCycleId) {
+            return { ...cycle, interruptedDate: new Date() }
+          } else {
+            return cycle
+          }
+        }),
+        activeCycleId: null,
+      }
+    case 'markCycleAsFinished':
+      return {
+        ...state,
+        cycles: state.cycles.map((cycle) => {
+          if (cycle.id === state.activeCycleId) {
+            return { ...cycle, finishDate: new Date() }
+          } else {
+            return cycle
+          }
+        }),
+        activeCycleId: null,
+      }
+    default:
+      return state
+  }
+}
 
+com isso o codigo ja deu uma reduzida. e esta as coisas melhor explicadas. agora vamos melhorar um pouco o nosso codigo no reducer na função.
+ate agora a gente colocou os tios de action que a gente pode receber. 
+sempre que a gente quiser mudar algo la no dispatch a gente vai ter que ir no reducer para lembrar como escrevemos o type.
+para isso la no reducer nos vamos criar um negocio chamado enum e exportalo. isso é uma proprioedade ja do typescritp/
+vamos chamar o enum de actionTypes {} e ele recebe um objeto
+e dentro dele a gente vai colocar os nomes das coisas e dar o string que corresponde. assim la na outra pagina apenas com um cntl espaço vai aparecer as opçoes. e alem disso se a gente mudar la muda logo tudo de uma vez. fica assim
+export enum ActionTypes {
+  addNewCycle = 'addNewCycle',
+  interuptCurrentCycle = 'interuptCurrentCycle',
+  markCycleAsFinished = 'markCycleAsFinished',
+}
 
-
-
-
-
-
-
-
-
-
-
+agora nos cases a gente substitui o codigo que esta uma string por actionType.NewCycle por exemplo e fazemos o mesmo no dispatch na pagina do context.
