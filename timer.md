@@ -1692,6 +1692,249 @@ era assim
     setAmountSecondsPassed(0)
   }
 
+  fazemos isso com as outras funçoes comentando elas para não apagar nem dar erro na app rodando.
+
+  quando formos acessar a cycle dentro da funç:éao a gente vai fazer usando o state. o state é o valor nesse caso davariavel cycles.
+  se  gente acessar o action vamos ter os dados do cyclo que criamos (porque enviamos o newCycle que contem todos esses dados;)
+  agora podemos incrementar o reducer com os if e els
+  dizendo que se o acion.type for igual a addNewCycle a gente pode mandar ele fazer algo diferente de retornar o ciclo vazio. e fazemos elses para as outras possibilidades. dessa forma
+   const [cycles, dispatch] = useReducer((state: Cycle[], action: any) => {
+    if (action.type === 'addNewCycle') {
+      return [...state, action.payload.newCycle]
+    }
+    return state
+  }, [])
+
+  agora o useReducer vai ser uma função que vai agregar todas as mudanças de estado. a gente vai dizer o estado vai mudar dentro da useReducer usando as possibilidades que o dispatch vai enviar.
+  e a gente destingui qual alteração vai acontecer atravez do type que o dispatch envia.
+  e o retorno que fazemos da função vai ser sempre o novo valor que esse estado vai recevber.
+  
+em diversos momentos na aplicação a gente alterava o ciclo, e logo depois alterava o id do ciclo ativo.
+ou seja a gente fazia duas alterações no estado. e as vezes ate tres coisas alterando no estado as vezes. as vezes chamava funçoes diferentes por conta de estados corealionados.
+porem agora com reducer as oisas vao mudar.
+usando o reducer a gente não tem a obrigação de salvar so uma informação como a lista de ciclos. a gente pode manter e alterar diversas informaçoes dentro dele. 
+vamos criar uma interface para isso que vai ser os states do ciclos, o tipo de inormaçoes que vamos usar no nosso reducer. vamos salar como objeto e dizer que dentro dele vamos ter um array de ciclos. mas vamos salvar logo tambem o nosso ciclo ativo.
+agora no reducer no state a gente coloca essa interface.
+fica assim
+
+interface CyclesState {
+  cycles: Cycle[]
+  activeCycleId: string | null
+}
+
+export const cyclesContext = createContext({} as cyclesContextType)
+
+export function CyclesContextProvider({
+  children,
+}: CyclesContextProviderProps) {
+  const [cycles, dispatch] = useReducer((state: CyclesState, action: any) => {
+    if (action.type === 'addNewCycle') {
+      return {
+        ...state,
+        cycles: [...state.cycles, action.payload.newCycle],
+      }
+    }
+    return state
+  }, {
+    Cycles: [],
+    activeCycleId: null
+  })
+
+  temos que mudar o set do fim. para ele iniciar que estava como um array agora tem que iniciar como o objeto que é o interface e colocar o cycle como array vazio e o activecycleId como null.
+
+  agora nos podemos ter varios estados armazenados em um so reducer. paranão ficar generico vamos mudar o nome do reducer de cycles para cyclesState. e agora podemos desetruturar ele.
+  fazemos essa const logo abaixo do reducer para não precisar mais do estado para sobrescver as coisas ligadas ao cycles e ao activeId
+  const { cycles, activeCycleId } = cyclesState
+
+  apagamos isso: const [activeCycleId, setActiveCycleId] = useState<string | null>(null) 
+  depois verificar se esta certo.
+
+  agora vamos apagar algumas coisas
+  no createNewCycle a gente estava pegando o id do newcycle e setando como id ativo assim
+  setActiveCycleId(newCycle.id)
+  podemos apagar isso.
+  porem teremos que ir la no reducer e alem de mexer so na variavel cycles vamos tambem mexer na activeCycleId falando que o novo valor dela vai ser um action.payload.newCycleId
+  return {
+          ...state,
+          cycles: [...state.cycles, action.payload.newCycle],
+          activeCycleId: action.payload.newCycle.id,
+        } 
+    fica assim. em uma so função ele faz as duas coisas. ele cria um novo state com o novo ciclo e ja seta o id do ciclo ativo.
+    para o interupt tambem estamos passanod o cicle id como null.
+
+    agora temos que ir la fazer umoutro if. colocamos noss action payloiad e para a ação a gente copia a função do interuptedcycles nele
+         if (action.type === 'interuptCurrentCycle') {
+        return {
+          ...state,
+          cycles: state.cycles.map((cycle) => {
+            if (cycle.id === state.activeCycleId) {
+              return { ...cycle, interruptedDate: new Date() }
+            } else {
+              return cycle
+            }
+          }),
+          activeCycleId: null,
+        }
+      }
+      não precisamos masi setar o state antes poque ele ja esta setado. e temos so que dizer que o state.cycles.map que não tinha antes. e tambem o state antes do activecycleId
+
+      vamos marcar agora o ciclo como finalizado.
+      como o funcionamento é parecido do interupter a gente vai copiar o codigo e mudar de interrupted date para finisheddate.
+
+como tem muito if e um if anula as outras opçoes. por exemplo se o ciclo for interropido ele não vai ser criado como novo. a gente pode fazer um switch.a estrutura do switch da casos diferentes, ,no nosso caso pelo actionType que é o argumento que passamos. e cada caso vamos dar um nome que é o que esta no action type. e um default para não ser nenhuma das alternativas anteriores. o default vai ser o return state.
+agora a gente pega o codigo que esta em cada if e move ele para baixo dos seus cases especificos.
+
+      agora a pagina fica assim
+      
+
+import { ReactNode, createContext, useState, useReducer } from 'react'
+
+interface CreateCycleData {
+  task: string
+  minutesAmount: number
+}
+
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+  startDate: Date
+  interruptedDate?: Date
+  finishDate?: Date
+}
+interface cyclesContextType {
+  cycles: Cycle[]
+  activeCycle: Cycle | undefined
+  activeCycleId: string | null
+  markCurrentCycleAsFinished: () => void
+  amountSecondsPassed: number
+  updatedSecondsPassed: (seconds: number) => void
+  createNewCycle: (data: CreateCycleData) => void
+  interruptCurrentCycle: () => void
+}
+
+interface CyclesContextProviderProps {
+  children: ReactNode
+}
+
+interface CyclesState {
+  cycles: Cycle[]
+  activeCycleId: string | null
+}
+
+export const cyclesContext = createContext({} as cyclesContextType)
+
+export function CyclesContextProvider({
+  children,
+}: CyclesContextProviderProps) {
+  const [cyclesState, dispatch] = useReducer(
+    (state: CyclesState, action: any) => {
+      switch (action.type) {
+        case 'addNewCycle':
+          return {
+            ...state,
+            cycles: [...state.cycles, action.payload.newCycle],
+            activeCycleId: action.payload.newCycle.id,
+          }
+        case 'interuptCurrentCycle':
+          return {
+            ...state,
+            cycles: state.cycles.map((cycle) => {
+              if (cycle.id === state.activeCycleId) {
+                return { ...cycle, interruptedDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+            activeCycleId: null,
+          }
+        case 'markCycleAsFinished':
+          return {
+            ...state,
+            cycles: state.cycles.map((cycle) => {
+              if (cycle.id === state.activeCycleId) {
+                return { ...cycle, interruptedDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+            activeCycleId: null,
+          }
+        default:
+          return state
+      }
+    },
+    {
+      cycles: [],
+      activeCycleId: null,
+    },
+  )
+
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+  const { cycles, activeCycleId } = cyclesState
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  function updatedSecondsPassed(seconds: number) {
+    setAmountSecondsPassed(seconds)
+  }
+
+  function markCurrentCycleAsFinished() {
+    dispatch({
+      type: 'markCycleAsFinished',
+      payload: {
+        activeCycleId,
+      },
+    })
+  }
+
+  function createNewCycle(data: CreateCycleData) {
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+      startDate: new Date(),
+    }
+
+    dispatch({
+      type: 'addNewCycle',
+      payload: {
+        newCycle,
+      },
+    })
+    setAmountSecondsPassed(0)
+  }
+
+  function interruptCurrentCycle() {
+    dispatch({
+      type: 'interuptCurrentCycle',
+      payload: {
+        activeCycleId,
+      },
+    })
+  }
+
+  return (
+    <cyclesContext.Provider
+      value={{
+        cycles,
+        activeCycle,
+        activeCycleId,
+        markCurrentCycleAsFinished,
+        amountSecondsPassed,
+        updatedSecondsPassed,
+        createNewCycle,
+        interruptCurrentCycle,
+      }}
+    >
+      {children}
+    </cyclesContext.Provider>
+  )
+}
+
+PERCEBI UM BUG; SE DEIXAR O CODIGO RODAR ATE O FIM ELE NÃO SAI DO HISTORICO COMO FINALIZADO; FICA PRA SEMPRE EM ANDAMENTO;
+
+
+
 
 
 
