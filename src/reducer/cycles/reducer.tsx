@@ -21,7 +21,7 @@ export function cyclesReducer(state: CyclesState, action: any) {
     case ActionTypes.addNewCycle:
       return produce(state, (draft) => {
         draft.cycles.push(action.payload.newCycle)
-        draft.activeCycleId = action.payload.newCycle.id
+        draft.activeCycleId = action.payload.newCycleId
       })
     case ActionTypes.interuptCurrentCycle:
       return produce(state, (draft) => {
@@ -45,7 +45,6 @@ export function cyclesReducer(state: CyclesState, action: any) {
         draft.activeCycleId = null
         draft.cycles[currentCycleIndex].finishDate = new Date()
       })
-
     default:
       return state
   }
