@@ -2047,7 +2047,7 @@ e esse produce é o metodo que vamos usar.
 o que vamos fazer. imagina a estruura que fizemos quando queremos adicionar um novo ciclo. precisamos copiar todos os array existente e adicionar mais um. como fazemos aqui
    ...state,
         cycles: [...state.cycles, action.payload.newCycle],
-        activeCycleId: action.payload.newCycle.id,
+        activeCycleId: action.payload.newCycle.Id,
 
 com o immer fica mais simples, a gente faz o return produce( e para o produce a gente passa o state e uma variavel chamada draft. o draft é o rascunho e ele tem as mesmas propriedades do state/)  o draft faz uma arrow e na arrow a gente passa o que queremos modificar. agora a gente trabalha com o draft como se ele fosse uma variavel mutavel. por exemplo se queremos adicionar uma nova informação ao array de cyclos a gente pode fazer o draft.cycles.push(aqui a nova info) que é o metodo de adicionar algo a um array. não precisamos mais ficar copiando o state a cadavez.
 então podemos substituir o que estava escrito no codigo copiado a cima por isso aqui
@@ -2071,4 +2071,84 @@ fica assim
         draft.cycles[currentCycleIndex].interruptedDate = new Date()
       })
 
-e vamos fazer um codigo praticamente igual pra ação de marcar como finalizado. então vamos copiar e colar e mudar so o finishDAte
+e vamos fazer um codigo praticamente igual pra ação de marcar como finalizado. então vamos copiar e colar e mudar so o finishDAte.
+
+# armazenando ciclos no storage
+na nossa aplicação a gente vai sempre criando nossos ciclos do zero. e para o usuario que quer ver os ciclos que ele ja fez em um historico pode ser bom a gente armazenadr eles em algum liugar
+vamos no contexto e vamos cfriar um use effect apos a const depois da amountseconds passed.
+esse useEffect vai ser para que toda vez que o cycleState mudar por algum motivo, a gente vai salvar isso em algum lugar.
+para isso vamos criar uma variavel stateJSON = JSON.stringify(cyclesState)
+o storage so permite que salvemos texto nele entao temos que usar o stringify
+depois ainda dentro dessa função vamos dar um localStorage.setItem('dar um nome aqui', stateJSON ) e nesse local storage o primeiro parametro é o nome e o segundo é o que vamos salvar no caso a const que criamos.
+uma dica para adicionar o localstorage é a gente sempre botar um prefixo. o nome do projeto dois pontos e depois o nome do item
+isso porque como estamos trabalhando com localhost todas as informações vao dividir o mesmo local storage. entõa se usarmos nomes genericos uma pode sustituir a outra. porque pode ter dois cyclesState em projetos diferentes.
+oitra dica que é mais pra prdução é fazer uma versão. essa versão é pra se um dia a gente trocar a variavel quem tiver com a versão antiga pode causar bug na aplicação porque ela vai estar com o formato dos dados desatualizado.
+useEffect(() => {
+    const stateJSON = JSON.stringify(cyclesState)
+    localStorage.setItem('@ignite-timer:cycles-state-1.0.0', stateJSON)
+  }, [cyclesState])
+agora a gente salva isso e se a gente for la no devtool em storage a gente pode ver que esta la.
+porem no so estamos armazenando e não recuperando. entao se dermos um reload a gente não tem acesso.
+para isso vamos usar o terceiro parametro do useReducer que pode ser uma função que pode ser disparada assim q o reducer for criado para eu recuperar os dados iniciais do meu reducer de algum outro lugar. o useReducer fica assim
+   cyclesReducer,
+    {
+      cycles: [],
+      activeCycleId: null,
+    },
+    () => {
+      const storedStateAsJSON = localStorage.getItem(
+        '@ignite-timer:cycles-state-1.0.0',
+      )
+      if (storedStateAsJSON) {
+        return JSON.parse(storedStateAsJSON)
+      }
+    },
+    a gente criou uma const para pegar o que esta guardado e caso tenha algo guardado ele vai retornar o que esta guardado.
+
+    agora esta funciononando mas se a gente da f5 da um bug. acredito que porque a data esta indo como string. vamos corrigir.
+    poqre o json so salva string ou array etc.
+    vamos resolver de um jeito.
+    o erro aconteceu la no countdown
+    vamos la no countdown no activeCycle.startDate que fica aqui
+      const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+
+  useEffect(() => {
+    let interval: number
+    if (activeCycle) {
+      interval = setInterval(() => {
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate,
+        )
+
+        vamos botar por vomta dele um newDate() ai se ele for uma string ele vai converter em uma data e se ele ja for uma data ele não muda nada fica assiù
+        
+  useEffect(() => {
+    let interval: number
+    if (activeCycle) {
+      interval = setInterval(() => {
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          new Date(activeCycle.startDate),
+        )
+    
+    e isso ja resolve o bug que estava dando.
+     agora se a gente der reload na pagina a contagem continua.
+     porem demora um tempinho e perde um segundo porque o codigo esta demorando um segundo pra se realizar. como mudar isso a gente pode ir no contexto e na função que seta o amountsecondpassed como 0 a gente pode botrar uma função
+      const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
+      copiamos o codigo do countdown do seconds difference e botamos ara retornar zero.
+      colocamos as consts de activecycle pra cima dele e fazemos um se a gente tiver um activecycle a gente vai rerotnar a diferença em segundos. o codigo fica assim
+      const [amountSecondsPassed, setAmountSecondsPassed] = useState(() => {
+    if (activeCycle) {
+      return differenceInSeconds(new Date(), new Date(activeCycle.startDate))
+    }
+
+    return 0
+  })
+
+  agora esta funcionando.
+  um erro que a aconteceu foi que no nosso context. fazendo o storage. se a pessoa não tiver nada no storage não vai cair no if e não vai retornar nada no storage. e a useReducer sempre precisa retornar algo  entao caso o usuario não tenha nada no storage a gente vai retornar o reducer vazio. que vai ser o conteudo cicles[ activecycleid null] que era nosso segundo parametro.
+  para não ficar passando os parametros de novo a gente pode receber na função do storage o initialState que é exatamente o conteudo do segundo parametro.
+
+  AINDA TEM UM BUG NO HISTORY; VAMOS TENTAR RESOLVER DEPOIS ACHO QUE FIZ ALGO ERRADO;
