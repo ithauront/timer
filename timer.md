@@ -2004,3 +2004,71 @@ export enum ActionTypes {
 }
 
 agora nos cases a gente substitui o codigo que esta uma string por actionType.NewCycle por exemplo e fazemos o mesmo no dispatch na pagina do context.
+
+agora temos um enum que é igual a um dicionario que nos diz as opçoes de types possiveis.
+agora se algum momento a gente for fazer um dispatch e não lembrar como basta escrever actionTypes q ele sugere.
+
+# separando as actions
+
+vamos mudar o nome do arquivo cycle para reducer e vamos comocar ele dentro de uma pasta chamada cycles. essa pasta cycles vai estar dentro da pasta reducer 
+e ela vai conter tambem um arquivo chamado actions
+vamos concertar a importação por causa da mucança de nome.
+vamos passar o enum para o action. e concertar as importaçoes
+e agora vamos criar no action uma função para cada action
+e essa função vai retornar exqatamente o conteudo do meu dispatch para quanto eu quser iniciar um novo ciclo.
+e ovu passar para ela como paametro o newCycle com a typagem que irei iomportar. fica assim:
+export function addNewCycleAction(newCycle: Cycle) {
+  return {
+    type: ActionTypes.addNewCycle,
+    payload: {
+      newCycle,
+    },
+  }
+}
+
+e no dispatch a gente chama ela passando o newCycle assim
+dispatch(addNewCycleAction(newCycle))
+no mark as finished a gente não precisa passar payload porque ele ja esta la na função e nem passar parametros porque ja tem la tamem.
+o interrupt tambem não precisa de payload nem de parametro.
+agora qsue esta tudo feito o projeto deve rodar normal.
+
+;
+
+
+# immer
+vamos utilizar o immer que é uma biblioteca 
+o immer vai trbalhar com a imutabilidade do js. quando vamos alterar estados e essa alteração vai ser muito profunda. por exemplo quando a gente tem que fazer muitos maps para mudar apenas uma posição e tudo mais.
+o immer permite que a gente trabalhe com estruturas mutaveis, como se elas não fossem imutaveis.
+
+vamos intstalar o immer nesse projeto
+npm i immer
+e na pagina reducer vamos importar de dentro do immer o produce
+e esse produce é o metodo que vamos usar.
+o que vamos fazer. imagina a estruura que fizemos quando queremos adicionar um novo ciclo. precisamos copiar todos os array existente e adicionar mais um. como fazemos aqui
+   ...state,
+        cycles: [...state.cycles, action.payload.newCycle],
+        activeCycleId: action.payload.newCycle.id,
+
+com o immer fica mais simples, a gente faz o return produce( e para o produce a gente passa o state e uma variavel chamada draft. o draft é o rascunho e ele tem as mesmas propriedades do state/)  o draft faz uma arrow e na arrow a gente passa o que queremos modificar. agora a gente trabalha com o draft como se ele fosse uma variavel mutavel. por exemplo se queremos adicionar uma nova informação ao array de cyclos a gente pode fazer o draft.cycles.push(aqui a nova info) que é o metodo de adicionar algo a um array. não precisamos mais ficar copiando o state a cadavez.
+então podemos substituir o que estava escrito no codigo copiado a cima por isso aqui
+  return produce(state, (draft) => {
+        draft.cycles.push(action.payload.newCycle)
+        draft.activeCycleId = action.payload.newCycleId
+      })
+nesse primeiro caso o immer não teve muito ganho, não mudou muita coisa pq a gente alterava pouco. mas poutros casos com mais alteração vao valer mais a pena.
+para encontrar o ciclo que tem o id igual o id do ciclo atual para a gente poder interromper ele a gente vai criar uma const, dentro ou fora do produce. e nessa const a gente vai dar um findIndex e procurar o ciclo que o id é igual o current cycle
+vamos botar que caso o find index retorne um valor abaixo de wero é pra dar o retrono do state normal isso pq abaixo de zero significa que ele não achou nenhum ciclo com id igual.
+e agora a gente vai colocar o draftcycles pra pegar o currentcycleIndex na data de interrupção e colocar a data atual. a data dele estava nula antes.
+fica assim
+   return produce(state, (draft) => {
+        const currentCycleIndex = state.cycles.findIndex((cycle) => {
+          return cycle.id === state.activeCycleId
+        })
+        if (currentCycleIndex < 0) {
+          return state
+        }
+        draft.activeCycleId = null
+        draft.cycles[currentCycleIndex].interruptedDate = new Date()
+      })
+
+e vamos fazer um codigo praticamente igual pra ação de marcar como finalizado. então vamos copiar e colar e mudar so o finishDAte
