@@ -3,14 +3,14 @@ import {
   HomeContainer,
   StartCountdownButton,
   StopCountdownButton,
-} from './styles.js'
+} from './styles'
 import { useContext } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
-import { NewCycleForm } from './components/newCycleForm/index.js'
-import { CountDown } from './components/countdown/index.js'
-import { cyclesContext } from '../../context/CyclesContext.js'
+import { cyclesContext } from '@/context/CyclesContext'
+import { NewCycleForm } from '@/components/newCycleForm'
+import { CountDown } from '@/components/countdown'
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'informe a tarefa'),

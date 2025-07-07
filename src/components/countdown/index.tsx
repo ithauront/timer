@@ -1,7 +1,7 @@
 import { useEffect, useContext } from 'react'
 import { CountdownContainer, Separator } from './styles'
 import { differenceInSeconds } from 'date-fns'
-import { cyclesContext } from '../../../../context/CyclesContext'
+import { cyclesContext } from '@/context/CyclesContext'
 
 export function CountDown() {
   const {
@@ -15,7 +15,8 @@ export function CountDown() {
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
 
   useEffect(() => {
-    let interval: number
+    let interval: ReturnType<typeof setInterval>
+
     if (activeCycle) {
       interval = setInterval(() => {
         const secondsDifference = differenceInSeconds(

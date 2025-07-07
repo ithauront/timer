@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { Cycle } from './reducer'
 
 export enum ActionTypes {
