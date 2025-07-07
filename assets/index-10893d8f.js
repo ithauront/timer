@@ -323,4 +323,4 @@ body, input, textarea, button {
 
   display: flex;
   flex-direction: column;
-`;function f2(){return Xe(d2,{children:[X(c2,{}),X(V1,{})]})}function h2(){return X(W1,{children:Xe(Xo,{path:"/",element:X(f2,{}),children:[X(Xo,{path:"/",element:X(__,{})}),X(Xo,{path:"/history",element:X(s2,{})})]})})}function p2(){return Xe(Ug,{theme:q1,children:[X(Q1,{children:X(f_,{children:X(h2,{})})}),X(J1,{})]})}Pl.createRoot(document.getElementById("root")).render(X(S.StrictMode,{children:X(p2,{})}));
+`;function f2(){return Xe(d2,{children:[X(c2,{}),X(V1,{})]})}function h2(){return X(W1,{children:Xe(Xo,{path:"/",element:X(f2,{}),children:[X(Xo,{path:"/",element:X(__,{})}),X(Xo,{path:"/history",element:X(s2,{})})]})})}function p2(){return Xe(Ug,{theme:q1,children:[X(Q1,{basename:"/timer",children:X(f_,{children:X(h2,{})})}),X(J1,{})]})}Pl.createRoot(document.getElementById("root")).render(X(S.StrictMode,{children:X(p2,{})}));
