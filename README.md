@@ -6,6 +6,14 @@ The project simulates task cycles with countdowns. It features state management 
 
 ---
 
+## 🌐 Live Preview
+
+[![View on GitHub Pages](https://img.shields.io/badge/Live%20Preview-Click%20Here-blue?style=for-the-badge)](https://ithauront.github.io/timer/)
+
+Or access directly: [https://ithauront.github.io/timer/]([https://ithauront.github.io/ToDoList/](https://ithauront.github.io/timer/))
+
+---
+
 ## 🚀 Technologies Used
 
 - **React**
