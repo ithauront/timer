@@ -13,6 +13,14 @@ export const HomeContainer = styled.main`
     align-items: center;
     gap: 3.5rem;
   }
+
+  @media (max-width: 600px) {
+    padding: 1rem;
+
+    form {
+      gap: 2rem;
+    }
+  }
 `
 
 export const BaseCountdownButton = styled.button`
@@ -39,6 +47,12 @@ export const BaseCountdownButton = styled.button`
 
   &:not(disabled):hover {
     background: ${(props) => props.theme['green-700']};
+  }
+
+  @media (max-width: 600px) {
+    font-size: 0.875rem;
+    padding: 0.75rem;
+    width: 50%;
   }
 `
 export const StartCountdownButton = styled(BaseCountdownButton)`

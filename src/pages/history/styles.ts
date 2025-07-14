@@ -6,6 +6,7 @@ export const HistoryContainer = styled.main`
 
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   h1 {
     font-size: 1.5rem;
@@ -52,6 +53,9 @@ export const HistoryContainer = styled.main`
         padding-left: 1.5rem;
       }
     }
+    @media (max-width: 600px) {
+      display: none;
+    }
   }
 `
 
@@ -59,6 +63,12 @@ export const HistoryList = styled.div`
   flex: 1;
   overflow: auto;
   margin-top: 2rem;
+  overflow-y: auto;
+  margin-top: 2rem;
+
+  @media (max-width: 600px) {
+    overflow-x: auto;
+  }
 `
 const STATUS_COLOR = {
   yellow: 'yellow-500',
@@ -81,5 +91,34 @@ export const Status = styled.div<StatusProps>`
     height: 0.5rem;
     border-radius: 50%;
     background: ${(props) => props.theme[STATUS_COLOR[props.statusColor]]};
+  }
+`
+
+export const MobileHistoryList = styled.div`
+  display: none;
+
+  @media (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+    overflow-y: auto;
+  }
+`
+
+export const MobileHistoryItem = styled.div`
+  background-color: ${(props) => props.theme['gray-700']};
+  padding: 1rem;
+  border-radius: 8px;
+  color: ${(props) => props.theme['gray-100']};
+  font-size: 0.875rem;
+  line-height: 1.4;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  strong {
+    font-size: 1rem;
   }
 `
